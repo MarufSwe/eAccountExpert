@@ -4,6 +4,7 @@ from .models import Shop, SalesData
 import pandas as pd
 from django.db.utils import IntegrityError
 
+
 # # storing each transaction as a separate row with duplicate shop names
 # def upload_sales_data(request):
 #     shops = Shop.objects.all()  # Fetch all shops
