@@ -10,21 +10,27 @@
 <body>
     <div class="container mt-5">
         <h1 class="mb-4">Sales Data</h1>
-
+ 
         {% for sales in sales_data %}
             <div class="card mb-3">
                 <div class="card-header">
-                    <h4>{{ sales.shop.name }} (Uploaded on: {{ sales.date_uploaded }})</h4>
+                    <h4>{{ sales.shop.name }} ({{ sales.date_uploaded }})</h4>
                 </div>
                 <div class="card-body">
                     <ul>
-                        <!-- Loop through dynamic data (key-value pairs) -->
+                        <!-- Loop through the sales data -->
                         {% if sales.data %}
-                            {% for key, value in sales.data.items %}
-                                <li><strong>{{ key }}:</strong> {{ value }}</li>
+                            {% for entry in sales.data %}
+                                <li>
+                                    <strong>Date:</strong> {{ entry.date }}<br>
+                                    <strong>Amount:</strong> ${{ entry.amount }}<br>
+                                    <strong>Category:</strong> {{ entry.category }}
+                                </li>
+                            {% empty %}
+                                <li>No data available for this sale.</li>
                             {% endfor %}
                         {% else %}
-                            <li>No data available for this sale.</li>
+                            <li>No data available.</li>
                         {% endif %}
                     </ul>
                 </div>
@@ -35,3 +41,4 @@
     </div>
 </body>
 </html>
+ 
