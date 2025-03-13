@@ -1,4 +1,3 @@
-<!-- sales/sales_data_list.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,39 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sales Data</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .scrollable-box {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+        .table th, .table td {
+            white-space: nowrap;
+        }
+    </style>
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="mb-4">Sales Data</h1>
- 
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>📊 Sales Data</h2>
+            <a href="{% url 'upload_sales_data' %}" class="btn btn-success">📤 Upload New File</a>
+        </div>
+
         {% for sales in sales_data %}
-            <div class="card mb-3">
-                <div class="card-header">
-                    <h4>{{ sales.shop.name }} ({{ sales.date_uploaded }})</h4>
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">{{ sales.shop.name }} (📅 {{ sales.date_uploaded }})</h5>
                 </div>
                 <div class="card-body">
-                    <ul>
-                        <!-- Loop through the sales data -->
-                        {% if sales.data %}
-                            {% for entry in sales.data %}
-                                <li>
-                                    <strong>Date:</strong> {{ entry.date }}<br>
-                                    <strong>Amount:</strong> ${{ entry.amount }}<br>
-                                    <strong>Category:</strong> {{ entry.category }}
-                                </li>
-                            {% empty %}
-                                <li>No data available for this sale.</li>
-                            {% endfor %}
-                        {% else %}
-                            <li>No data available.</li>
-                        {% endif %}
-                    </ul>
+                    {% if sales.data %}
+                        <div class="scrollable-box">
+                            <table class="table table-sm table-bordered table-striped">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        {% for key in sales.data.0.keys %}
+                                            <th>{{ key|capfirst }}</th>
+                                        {% endfor %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for record in sales.data %}
+                                        <tr>
+                                            {% for value in record.values %}
+                                                <td>{{ value }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted">No data available.</p>
+                    {% endif %}
                 </div>
             </div>
         {% empty %}
-            <p>No sales data available.</p>
+            <p class="alert alert-warning text-center">No sales data available.</p>
         {% endfor %}
     </div>
 </body>
 </html>
- 
