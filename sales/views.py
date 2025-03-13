@@ -60,8 +60,9 @@ def upload_sales_data(request):
             if all_rows:
                 # Use the selected shop and store all rows in the 'data' field as a JSON object
                 SalesData.objects.create(shop=shop, data=all_rows)
+            return redirect('sales_data_list')
              
-            return HttpResponse("File uploaded and data processed successfully.")
+            # return HttpResponse("File uploaded and data processed successfully.")
         except IntegrityError as e:
             return HttpResponse(f"Error processing file: {e}", status=400)
         except Exception as e:
@@ -71,7 +72,47 @@ def upload_sales_data(request):
     return render(request, 'sales/upload.html', {'shops': shops})
 
 
+# ================Shop CRUD==================
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse
+from .models import Shop, SalesData
+from .forms import ShopForm
 
+# ✅ List all shops
+def shop_list(request):
+    shops = Shop.objects.all()
+    return render(request, 'shops/shop_list.html', {'shops': shops})
+
+# ✅ Create new shop
+def shop_create(request):
+    if request.method == 'POST':
+        form = ShopForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('shop_list')
+    else:
+        form = ShopForm()
+    return render(request, 'shops/shop_form.html', {'form': form})
+
+# ✅ Update shop
+def shop_update(request, pk):
+    shop = get_object_or_404(Shop, pk=pk)
+    if request.method == 'POST':
+        form = ShopForm(request.POST, instance=shop)
+        if form.is_valid():
+            form.save()
+            return redirect('shop_list')
+    else:
+        form = ShopForm(instance=shop)
+    return render(request, 'shops/shop_form.html', {'form': form})
+
+# ✅ Delete shop
+def shop_delete(request, pk):
+    shop = get_object_or_404(Shop, pk=pk)
+    if request.method == 'POST':
+        shop.delete()
+        return redirect('shop_list')
+    return render(request, 'shops/shop_confirm_delete.html', {'shop': shop})
 
 
 

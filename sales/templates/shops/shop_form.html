@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if form.instance.pk %}Edit Shop{% else %}Add New Shop{% endif %}</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .form-container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group label {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="form-container">
+            <h3 class="text-center mb-4">{% if form.instance.pk %}Edit Shop{% else %}Add New Shop{% endif %}</h3>
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="id_name">Shop Name</label>
+                    <input type="text" class="form-control" id="id_name" name="name" value="{{ form.name.value|default_if_none:'' }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_location">Location</label>
+                    <input type="text" class="form-control" id="id_location" name="location" value="{{ form.location.value|default_if_none:'' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="id_owner_name">Owner Name</label>
+                    <input type="text" class="form-control" id="id_owner_name" name="owner_name" value="{{ form.owner_name.value|default_if_none:'' }}">
+                </div>
+
+                <div class="form-group">
+                    <label for="id_contact_number">Contact Number</label>
+                    <input type="text" class="form-control" id="id_contact_number" name="contact_number" value="{{ form.contact_number.value|default_if_none:'' }}">
+                </div>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'upload_sales_data' %}" class="btn btn-secondary">🔙 Cancel</a>
+                    <button type="submit" class="btn btn-primary">💾 Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
