@@ -7,4 +7,4 @@ class ShopAdmin(admin.ModelAdmin):
 
 @admin.register(SalesData)
 class SalesDataAdmin(admin.ModelAdmin):
-    list_display = ('shop', 'date_uploaded')
+    list_display = ('id', 'shop', 'date_uploaded')
