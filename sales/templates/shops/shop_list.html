@@ -43,7 +43,10 @@
             </tbody>
         </table>
 
-        <a href="{% url 'upload_sales_data' %}" class="btn btn-success">📤 Upload Sales Data</a>
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'shop_create' %}" class="btn btn-link">🔙 Cancel</a>
+            {% comment %} <a href="{% url 'upload_sales_data' %}" class="btn btn-success">📤 Upload Sales Data</a> {% endcomment %}
+        </div>
     </div>
 </body>
 </html>

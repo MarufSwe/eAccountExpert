@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload Sales Data</title>
+    <title>Upload Sales File</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
     <div class="container mt-5">
-        <h1>Upload Sales Data</h1>
+        {% comment %} <h1>Upload Sales Data</h1> {% endcomment %}
     
         <div class="d-flex justify-content-between align-items-center mb-3">
-            <h4>Select Shop</h4>
+            <h2>Upload Sales File</h2>
             <a href="{% url 'shop_create' %}" class="btn btn-success">➕ Create New Shop</a>
         </div>
     
@@ -31,7 +31,11 @@
                 <input type="file" class="form-control" id="file" name="file" accept=".csv, .xls, .xlsx, .pdf" required>
             </div>
             
-            <button type="submit" class="btn btn-primary">📤 Upload</button>
+            
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'sales_data_list' %}" class="btn btn-link">🔙 Cancel</a>
+                <button type="submit" class="btn btn-primary">📤 Upload</button>
+            </div>
         </form>
     </div>
     
