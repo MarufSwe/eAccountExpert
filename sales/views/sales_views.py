@@ -77,80 +77,72 @@ class SalesDataListView(ListView):
 # with pdf
 import pdfplumber
 import pandas as pd
+import re
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from ..models import SalesData, Shop
 from django.db import IntegrityError
 
 def upload_sales_data(request):
     shops = Shop.objects.all()  # Fetch all shops
-    all_rows = []  # Initialize all_rows at the start to avoid the "not assigned" error
+    all_rows = []  # Initialize to prevent errors
 
     if request.method == 'POST' and request.FILES['file']:
-        # Get the uploaded file
         file = request.FILES['file']
 
         try:
             if file.name.endswith('.xlsx'):
-                df = pd.read_excel(file)
-                # Process Excel data here
+                df = pd.read_excel(file, dtype=str)  # Read everything as string
                 for index, row in df.iterrows():
                     row_data = row.to_dict()
-                    # Convert any Timestamp values to strings
-                    row_data = {key: value if not isinstance(value, pd.Timestamp) else value.strftime('%Y-%m-%d') 
-                                for key, value in row_data.items()}
-                    # Remove any null values from row_data
-                    row_data = {key: value for key, value in row_data.items() if pd.notnull(value)}
-                    if row_data:
-                        all_rows.append(row_data)
+                    row_data = {
+                        key: (value.strftime('%Y-%m-%d') if isinstance(value, pd.Timestamp) else value if pd.notnull(value) else "")
+                        for key, value in row_data.items()
+                    }
+                    all_rows.append(row_data)
 
             elif file.name.endswith('.csv'):
-                df = pd.read_csv(file)
-                # Process CSV data here
+                df = pd.read_csv(file, dtype=str)  # Read everything as string
                 for index, row in df.iterrows():
                     row_data = row.to_dict()
-                    # Convert any Timestamp values to strings
-                    row_data = {key: value if not isinstance(value, pd.Timestamp) else value.strftime('%Y-%m-%d') 
-                                for key, value in row_data.items()}
-                    # Remove any null values from row_data
-                    row_data = {key: value for key, value in row_data.items() if pd.notnull(value)}
-                    if row_data:
-                        all_rows.append(row_data)
+                    all_rows.append(row_data)
 
             elif file.name.endswith('.pdf'):
-                # Handle PDF file
                 with pdfplumber.open(file) as pdf:
-                    first_page = pdf.pages[0]
-                    text = first_page.extract_text()
+                    extracted_text = ""
+                    for page in pdf.pages:
+                        extracted_text += page.extract_text() + "\n"
 
-                    if text:
-                        lines = text.split('\n')
-                        data_lines = [line for line in lines if line.strip()]
-                        for line in data_lines:
-                            parts = line.split()
-                            if len(parts) > 1:
-                                row_data = {}
-                                for idx, part in enumerate(parts):
-                                    column_name = f"column_{idx+1}"  # Generate dynamic column names
-                                    row_data[column_name] = part
-                                all_rows.append(row_data)
+                    if extracted_text.strip():  # Ensure PDF is not empty
+                        data_lines = [line.strip() for line in extracted_text.split("\n") if line.strip()]
+                        
+                        if not data_lines:
+                            return HttpResponse("No readable text found in the PDF.", status=400)
+
+                        # Try to extract headers dynamically
+                        headers = re.split(r'\s{2,}', data_lines[0]) if len(data_lines) > 0 else []
+                        
+                        if len(headers) < 2:  # If headers are not found, create default column names
+                            headers = [f"column_{i+1}" for i in range(len(data_lines[1].split()))]
+
+                        # Extract rows dynamically
+                        for line in data_lines[1:]:
+                            row_values = re.split(r'\s{2,}', line)  # Split data by spaces/tabs
+                            row_dict = {headers[idx]: value for idx, value in enumerate(row_values) if idx < len(headers)}
+                            all_rows.append(row_dict)
+
                     else:
-                        return HttpResponse("No valid text found in the PDF.", status=400)
+                        return HttpResponse("PDF is empty or unreadable.", status=400)
 
             else:
                 return HttpResponse("Invalid file format. Only .csv, .xlsx, and .pdf are supported.", status=400)
 
-            # Get the shop selection from the form
-            selected_shop_id = request.POST.get('shop')  # Get the selected shop id
-            
-            if selected_shop_id:
-                shop = Shop.objects.get(id=selected_shop_id)
-            else:
+            selected_shop_id = request.POST.get('shop')
+            if not selected_shop_id:
                 return HttpResponse("Shop is required", status=400)
+            
+            shop = Shop.objects.get(id=selected_shop_id)
 
-            # If we have rows, store them in the database as a JSON field
-            if all_rows:
-                # Use the selected shop and store all rows in the 'data' field as a JSON object
+            if all_rows:  # Ensure we only save if there's data
                 SalesData.objects.create(shop=shop, data=all_rows)
 
             return redirect('sales_data_list')
@@ -160,5 +152,4 @@ def upload_sales_data(request):
         except Exception as e:
             return HttpResponse(f"An error occurred: {e}", status=400)
 
-    # Pass the list of shops to the template
     return render(request, 'sales/upload.html', {'shops': shops})
