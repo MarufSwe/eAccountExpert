@@ -1,8 +1,6 @@
 # for dynamic csv columns
 from django.db import models
-from django.db.models import JSONField  # ✅ NEW (Use this)
-
-
+from django.db.models import JSONField
 
 class Shop(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -12,7 +10,6 @@ class Shop(models.Model):
 
     def __str__(self):
         return self.name
-
 
 
 class SalesData(models.Model):
@@ -25,3 +22,23 @@ class SalesData(models.Model):
 
     class Meta:
         db_table = "sales_data"
+
+
+# For Reconcilation
+class SlicerList(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.name
+
+class CatListD(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.name
+    
+class CatListC(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.name

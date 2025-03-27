@@ -10,6 +10,9 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
     <style>
         /* Sidebar Styling */
         #sidebar {
@@ -69,9 +72,9 @@
         <button id="sidebarCollapse" class="btn">
             ☰
         </button>
-        <a class="navbar-brand ml-2" href="">
+        <a class="navbar-brand ml-2" href="{% url 'sales_data_list' %}">
             <img src="{% static 'images/eAccountE.jpeg' %}" class="navbar-logo" alt="Logo">
-        </a>
+        </a>        
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -107,10 +110,13 @@
                 <a class="nav-link" href="">📊 Sales Data</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">📦 Inventory</a>
+                <a class="nav-link" href="{% url 'slicer_list' %}">📦 Slicer List</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#">🛒 Orders</a>
+                <a class="nav-link" href="{% url 'catlistd_list' %}">📦 Cat List D</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'catlistc_list' %}">🛒 Cat List C</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#">⚙️ Settings</a>

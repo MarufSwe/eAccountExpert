@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">
+        {% if form.instance.pk %}
+            Update Category D
+        {% else %}
+            Add New Category D
+        {% endif %}
+    </h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="id_name">Category Name</label>
+            <input type="text" class="form-control" id="id_name" name="name" value="{{ form.name.value }}" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            {% if form.instance.pk %}
+                Update Category
+            {% else %}
+                Add Category
+            {% endif %}
+        </button>
+        <a href="{% url 'catlistd_list' %}" class="btn btn-secondary ml-2">Cancel</a>
+    </form>
+</div>
+{% endblock %}
