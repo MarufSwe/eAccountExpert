@@ -4,10 +4,12 @@ from ..models import Shop, SalesData
 import pandas as pd
 from django.db.utils import IntegrityError
 from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 import pdfplumber
 
-class SalesDataListView(ListView):
+class SalesDataListView(LoginRequiredMixin, ListView):
     model = SalesData
     template_name = 'sales/sales_data_list.html'
     context_object_name = 'sales_data'

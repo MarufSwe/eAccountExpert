@@ -3,6 +3,7 @@ from django.contrib.auth import login, authenticate
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from sales.forms import RegisterForm, LoginForm
+from django.contrib.auth import logout
 
 # Register view
 def register(request):
@@ -34,3 +35,10 @@ def user_login(request):
     else:
         form = LoginForm()
     return render(request, 'auth/login.html', {'form': form})
+    
+
+# Logout view
+def user_logout(request):
+    logout(request)
+    messages.success(request, "You have been logged out successfully.")
+    return redirect('login')  # Redirect to the login page

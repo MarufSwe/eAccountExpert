@@ -1,99 +1,35 @@
-{% comment %} <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales Data</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        .scrollable-box {
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: #f8f9fa;
-        }
-        .table th, .table td {
-            white-space: nowrap;
-        }
-    </style>
-</head>
-<body>
-    <div class="container mt-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>📊 Sales Data</h2>
-            <a href="{% url 'upload_sales_data' %}" class="btn btn-success">📤 Upload New File</a>
-        </div>
-
-        {% for sales in sales_data %}
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">{{ sales.shop.name }} (📅 {{ sales.date_uploaded }})</h5>
-                </div>
-                <div class="card-body">
-                    {% if sales.data %}
-                        <div class="scrollable-box">
-                            <table class="table table-sm table-bordered table-striped">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        {% for key in sales.data.0.keys %}
-                                            <th>{{ key|capfirst }}</th>
-                                        {% endfor %}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for record in sales.data %}
-                                        <tr>
-                                            {% for value in record.values %}
-                                                <td>{{ value }}</td>
-                                            {% endfor %}
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <p class="text-muted">No data available.</p>
-                    {% endif %}
-                </div>
-            </div>
-        {% empty %}
-            <p class="alert alert-warning text-center">No sales data available.</p>
-        {% endfor %}
-    </div>
-</body>
-</html> {% endcomment %}
 
 
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales Data</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        .sticky-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: #17a2b8; /* Lighter blue background */
-            color: white;
-            padding: 10px 20px;
-            z-index: 1000;
-        }
-        .content {
-            padding: 80px 20px 20px; /* Adjust for fixed header */
-        }
-        .scrollable-box {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-    </style>
-</head>
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+
+<style>
+    /*
+    .sticky-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: #17a2b8; 
+        color: white;
+        padding: 10px 20px;
+        z-index: 1000;
+    }
+    .content {
+        padding: 80px 20px 20px; 
+    }*/
+    .scrollable-box {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+</style>
+
 <body>
     <div class="sticky-header d-flex justify-content-between align-items-center">
         <h4 class="mb-0">📊 Sales Data</h4>
@@ -138,4 +74,5 @@
         {% endfor %}
     </div>
 </body>
-</html>
+{% endblock %}
+
