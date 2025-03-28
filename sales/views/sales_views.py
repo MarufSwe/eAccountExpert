@@ -17,9 +17,6 @@ class SalesDataListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = SalesData.objects.all().order_by('shop', 'date_uploaded')
         
-        # # Debugging: Print the sales data to see the structure
-        # for sales in queryset:
-        #     print(sales.data)  # This will print the data in the terminal/log
         return queryset
 
 

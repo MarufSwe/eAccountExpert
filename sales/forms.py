@@ -30,12 +30,24 @@ class SlicerListForm(forms.ModelForm):
         model = SlicerList
         fields = ['name']
 
+    def __init__(self, *args, **kwargs):
+        super(SlicerListForm, self).__init__(*args, **kwargs)
+        self.fields['name'].initial = ""  # Set the initial value to an empty string instead of None
+
 class CatListDForm(forms.ModelForm):
     class Meta:
         model = CatListD
         fields = ['name']
 
+    def __init__(self, *args, **kwargs):
+        super(CatListDForm, self).__init__(*args, **kwargs)
+        self.fields['name'].initial = ""  # Set the initial value to an empty string
+
 class CatListCForm(forms.ModelForm):
     class Meta:
         model = CatListC
         fields = ['name']
+
+    def __init__(self, *args, **kwargs):
+        super(CatListCForm, self).__init__(*args, **kwargs)
+        self.fields['name'].initial = ""  # Set the initial value to an empty string

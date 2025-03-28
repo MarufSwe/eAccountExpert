@@ -42,3 +42,22 @@ class CatListC(models.Model):
 
     def __str__(self):
         return self.name
+    
+
+class ReconciliationData(models.Model):
+    description = models.TextField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+
+    credit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    debit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    def save(self, *args, **kwargs):
+        # Automatically assign Credit or Debit Amount based on Amount
+        if self.amount > 0:
+            self.credit_amount = self.amount
+            self.debit_amount = 0
+        else:
+            self.debit_amount = abs(self.amount)
+            self.credit_amount = 0
+
+        super().save(*args, **kwargs)

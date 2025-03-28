@@ -5,8 +5,16 @@
         <h2 class="mb-0">Slicer List</h2>
         <a href="{% url 'slicer_add' %}" class="btn btn-success">+ Add New Slicer</a>
     </div>
+
+    <!-- Table CSS to reduce row height -->
+    <style>
+        .table th, .table td {
+            padding: 3px 8px; /* Reduce the padding for both table header and data cells */
+            font-size: 14px; /* Optional: Adjust font size */
+        }
+    </style>
     
-    <table class="table table-bordered table-hover">
+    <table class="table table-bordered table-striped">
         <thead class="thead-dark">
             <tr>
                 <th>#</th>
@@ -27,12 +35,12 @@
                         <i class="fa-solid fa-trash"></i> <!-- Font Awesome 6 Trash Icon -->
                     </a>
                 </td>
-                
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
+
 
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">

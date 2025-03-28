@@ -4,9 +4,11 @@ from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
 from sales.forms import CatListDForm
 from sales.models import CatListD
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 # CatListD CRUD
-class CatListDView(ListView):
+class CatListDView(LoginRequiredMixin, ListView):
     model = CatListD
     template_name = 'reconciliation/cat_list_d/cat_list_d.html'
     context_object_name = 'items'

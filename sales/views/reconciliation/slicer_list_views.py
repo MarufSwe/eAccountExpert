@@ -3,9 +3,11 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from sales.forms import SlicerListForm
 from sales.models import SlicerList
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 # SlicerList CRUD
-class SlicerListView(ListView):
+class SlicerListView(LoginRequiredMixin, ListView):
     model = SlicerList
     template_name = 'reconciliation/slicer_list/slicer_list.html'
     context_object_name = 'items'
