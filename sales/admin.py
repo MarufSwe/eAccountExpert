@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ReconciliationData, Shop, SalesData, SlicerList, CatListD, CatListC
+from .models import Reconciliation, Shop, SalesData, SlicerList, CatListD, CatListC
 
 @admin.register(Shop)
 class ShopAdmin(admin.ModelAdmin):
@@ -30,9 +30,21 @@ admin.site.register(CatListD, CatListDAdmin)
 admin.site.register(CatListC, CatListCAdmin)
 
 
-@admin.register(ReconciliationData)
-class ReconciliationDataAdmin(admin.ModelAdmin):
-    list_display = ('description', 'amount', 'credit_amount', 'debit_amount')  # Fields to show in the list view
-    search_fields = ('amount',)  # Make description searchable
-    list_filter = ('credit_amount', 'debit_amount')  # Add filter options for credit and debit amounts
-    ordering = ('-id',)  # Order by most recent first
+# @admin.register(ReconciliationData)
+# class ReconciliationDataAdmin(admin.ModelAdmin):
+#     list_display = ('description', 'amount', 'credit_amount', 'debit_amount')  # Fields to show in the list view
+#     search_fields = ('amount',)  # Make description searchable
+#     list_filter = ('credit_amount', 'debit_amount')  # Add filter options for credit and debit amounts
+#     ordering = ('-id',)  # Order by most recent first
+
+
+@admin.register(Reconciliation)
+class ReconciliationAdmin(admin.ModelAdmin):
+    list_display = ("sales_data", "description", "amount", "credit_amount", "debit_amount", "slicer_new", "category_new")
+    search_fields = ("amount",)
+    list_filter = ("credit_amount", "debit_amount")
+
+    def get_queryset(self, request):
+        """Ensure the admin panel only loads necessary fields to improve performance."""
+        return super().get_queryset(request).only("description", "amount", "credit_amount", "debit_amount")
+

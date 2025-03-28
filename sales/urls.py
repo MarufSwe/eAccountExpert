@@ -1,6 +1,8 @@
 from django.urls import path
 
-from sales.views.reconciliation.import_bank_statement_views import import_bank_statement
+from sales.views.reconciliation.reconcile_sales_data_views import reconcile_sales_data
+from sales.views.reconciliation.reconciliation_list_views import reconciliation_list
+
 from .views.auth_views import register, user_login, user_logout
 from .views.sales_views import upload_sales_data, SalesDataListView
 from .views.shop_views import shop_list, shop_create
@@ -39,7 +41,12 @@ urlpatterns = [
     path('catlistc/edit/<int:pk>/', CatListCUpdateView.as_view(), name='catlistc_edit'),
     path('catlistc/delete/<int:pk>/', CatListCDeleteView.as_view(), name='catlistc_delete'),
 
-    path('import/', import_bank_statement, name='import_bank_statement'),
+    # path('import/', import_bank_statement, name='import_bank_statement'),
+    path("reconcile/<int:sales_data_id>/", reconcile_sales_data, name="reconcile_sales_data"),
+
+    path('sales_data/<int:sales_data_id>/reconciliation/', reconciliation_list, name='reconciliation_list'),
+
+
 
 
 ]
