@@ -12,54 +12,6 @@
     }
 </style>
 
-{% comment %} <body>
-    <div class="sticky-header d-flex justify-content-between align-items-center">
-        <h4 class="mb-0">📊 Sales Data</h4>
-        <a href="{% url 'upload_sales_data' %}" class="btn btn-light">📤 Upload New File</a>
-    </div>
-    
-    <div class="content">
-        {% for sales in sales_data %}
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">{{ sales.shop.name }} (📅 {{ sales.date_uploaded }})</h5>
-                    <button class="btn btn-warning reconcile-btn" data-record-id="{{ sales.id }}">
-                        🔄 Reconcile
-                    </button>
-                </div>
-                <div class="card-body">
-                    {% if sales.data %}
-                        <div class="scrollable-box">
-                            <table class="table table-sm table-bordered table-striped">
-                                <thead class="thead-light">
-                                    <tr>
-                                        {% for key in sales.data.0.keys %}
-                                            <th>{{ key|capfirst }}</th>
-                                        {% endfor %}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for record in sales.data %}
-                                        <tr>
-                                            {% for value in record.values %}
-                                                <td>{{ value }}</td>
-                                            {% endfor %}
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <p class="text-muted">No data available.</p>
-                    {% endif %}
-                </div>
-            </div>
-        {% empty %}
-            <p class="alert alert-warning text-center">No data available.</p>
-        {% endfor %}
-    </div>
-</body> {% endcomment %}
-
 <body>
     <div class="sticky-header d-flex justify-content-between align-items-center">
         <h4 class="mb-0">📊 Sales Data</h4>
@@ -69,19 +21,27 @@
     <div class="content">
         {% for sales in sales_data %}
             <div class="card mb-4 shadow-sm">
+
                 <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">{{ sales.shop.name }} (📅 {{ sales.date_uploaded }})</h5>
+                    
                     <div>
-                        <!-- Reconcile Button -->
-                        <a href="{% url 'reconciliation_list' sales.id %}" class="btn btn-warning">
-                            🔄 Reconcile
-                        </a>
-                        <!-- Add Reconciliation List button -->
+                        <!-- Reconcile Button (Disabled if already reconciled) -->
+                        {% if sales.is_reconciled %}
+                            <button class="btn btn-secondary" disabled>✔ Reconciled</button>
+                        {% else %}
+                            <button class="btn btn-warning reconcile-btn" data-record-id="{{ sales.id }}" onclick="reconcileSales({{ sales.id }})">
+                                🔄 Reconcile
+                            </button>
+                        {% endif %}
+                        
+                        <!-- View Reconciliation List Button -->
                         <a href="{% url 'reconciliation_list' sales.id %}" class="btn btn-primary ml-2">
-                            View Reconciliation List
+                            📋 View Reconciliation List
                         </a>
                     </div>
                 </div>
+                
                 <div class="card-body">
                     {% if sales.data %}
                         <div class="scrollable-box">
@@ -115,32 +75,111 @@
     </div>
 </body>
 
-
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        document.querySelectorAll(".reconcile-btn").forEach(button => {
-            button.addEventListener("click", function() {
-                const recordId = this.getAttribute("data-record-id");
-                fetch(`/reconcile/${recordId}/`, {
-                    method: "POST",
-                    headers: {
-                        "X-CSRFToken": "{{ csrf_token }}",
-                        "Content-Type": "application/json"
-                    },
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert("✅ Reconciliation successful!");
-                    } else {
-                        alert("❌ Error: " + data.error);
-                    }
-                })
-                .catch(error => console.error("Error:", error));
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll(".reconcile-btn").forEach(button => {
+                button.addEventListener("click", function() {
+                    const recordId = this.getAttribute("data-record-id");
+                    fetch(`/reconcile/${recordId}/`, {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": "{{ csrf_token }}",
+                            "Content-Type": "application/json"
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("✅ Reconciliation successful!");
+                        } else {
+                            alert("❌ Error: " + data.error);
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+                });
             });
         });
-    });
+    </script>
+        
+    <script>
+        function reconcileSales(salesId) {
+            // Send the reconcile request via AJAX
+            fetch(`/reconcile/${salesId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Disable the reconcile button and change the button text to "✔ Reconciled"
+                    const button = document.querySelector(`button[data-record-id='${salesId}']`);
+                    if (button) {
+                        button.disabled = true;
+                        button.innerText = '✔ Reconciled';
+                    }
+                    // Optionally reload the page to reflect changes immediately
+                    location.reload();
+                } else {
+                    alert(data.error || 'Reconciliation failed. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again later.');
+            });
+        }
+    </script>
+
+    <script>
+        function reconcileSales(salesId) {
+            // Find the button and replace it with the loading spinner
+            const button = document.querySelector(`button[data-record-id='${salesId}']`);
+            if (button) {
+                // Show the loader (🔄) while reconciliation is happening
+                button.disabled = true;  // Disable the button to prevent multiple clicks
+                button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
+            }
+    
+            // Send the reconcile request via AJAX
+            fetch(`/reconcile/${salesId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Change button to "✔ Reconciled" once reconciliation is done
+                    if (button) {
+                        button.innerHTML = '✔ Reconciled';
+                        button.disabled = true;
+                    }
+                    // Optionally reload the page to reflect changes immediately
+                    location.reload();
+                } else {
+                    alert(data.error || 'Reconciliation failed. Please try again.');
+                    // Reset the button to its original state if failed
+                    if (button) {
+                        button.innerHTML = '🔄 Reconcile';
+                        button.disabled = false;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again later.');
+                // Reset the button to its original state if there was an error
+                if (button) {
+                    button.innerHTML = '🔄 Reconcile';
+                    button.disabled = false;
+                }
+            });
+        }
     </script>
     
-
 {% endblock %}

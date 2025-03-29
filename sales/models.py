@@ -18,6 +18,9 @@ class SalesData(models.Model):
     date_uploaded = models.DateTimeField(auto_now_add=True)
     data = JSONField(null=True, blank=True)  # This will store the entire row as a dictionary (dynamic)
 
+    def is_reconciled(self):
+        return self.reconciliation_set.exists() 
+    
     def __str__(self):
         return f"Sales data for {self.shop.name} uploaded on {self.date_uploaded}"
 
@@ -73,9 +76,9 @@ class Reconciliation(models.Model):
     debit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     # ForeignKey relationships to your Slicer_List, Cat_List_d, and Cat_List_c
-    slicer_list = models.ForeignKey("SlicerList", on_delete=models.SET_NULL, null=True, blank=True)
-    cat_list_d = models.ForeignKey("CatListD", on_delete=models.SET_NULL, null=True, blank=True)
-    cat_list_c = models.ForeignKey("CatListC", on_delete=models.SET_NULL, null=True, blank=True)
+    slicer_list = models.ForeignKey(SlicerList, on_delete=models.SET_NULL, null=True, blank=True)
+    cat_list_d = models.ForeignKey(CatListD, on_delete=models.SET_NULL, null=True, blank=True)
+    cat_list_c = models.ForeignKey(CatListC, on_delete=models.SET_NULL, null=True, blank=True)
 
     # ForeignKey to link Reconciliation to the SalesData entry
     sales_data = models.ForeignKey(SalesData, on_delete=models.CASCADE)
