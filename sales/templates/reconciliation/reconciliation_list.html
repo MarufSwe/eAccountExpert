@@ -46,12 +46,21 @@
                     <td>{{ reconciliation.slicer_new }}</td>
                     <td>{{ reconciliation.category_new }}</td>
                     <td>{{ reconciliation.credit_amount }}</td>
-                    <td>{{ reconciliation.debit_amount }}</td>
+                    <td>
+                        {% if reconciliation.debit_amount > 0 %}
+                            - {{ reconciliation.debit_amount }}
+                        {% else %}
+                            {{ reconciliation.debit_amount }}
+                        {% endif %}
+                    </td>
+
+                    {% comment %} for 3 forign key values {% endcomment %}
+                    
                     <td>
                         {% if reconciliation.slicer %}
                             {{ reconciliation.slicer.name }}
                         {% else %}
-                            No Slicer
+                            Slicer
                         {% endif %}
                     </td>
                     <td>
@@ -70,9 +79,6 @@
                     </td>
                 </tr>
             {% endfor %}
-
-            
-    
         </tbody>
     </table>
     

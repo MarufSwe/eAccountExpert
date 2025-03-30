@@ -20,7 +20,7 @@
             max-width: 250px;
             height: 100vh;
             position: fixed;
-            background: #343a40;
+            background: #9cd4ff;
             color: white;
             transition: all 0.3s;
             padding-top: 20px;
@@ -29,14 +29,14 @@
             color: white;
         }
         #sidebar .nav-link:hover {
-            background: #495057;
+            background: #9cd4ff;
         }
         #sidebar .sidebar-header {
             padding: 10px;
             text-align: center;
             font-size: 1.2rem;
             font-weight: bold;
-            background: #212529;
+            background: #9cd4ff;
         }
         .sidebar-collapsed {
             margin-left: -250px;
@@ -54,26 +54,45 @@
         
         /* Toggle Button */
         #sidebarCollapse {
-            background: #343a40;
+            background: #9cd4ff;
             color: white;
             border: none;
             padding: 10px 15px;
             cursor: pointer;
         }
         #sidebarCollapse:hover {
-            background: #495057;
+            background: #9cd4ff;
         }
+        
+        #sidebar .nav-link {
+            color: black !important; /* Set text color to black */
+            font-weight: bold !important; /* Make the text bold */
+        }
+        
+        #sidebar .nav-link:hover {
+            background: #495057; /* Keep hover effect */
+        }
+        
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            color: hsl(206deg 100% 80.6%)
+        }
+        
     </style>
 </head>
 <body>
 
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
-        <button id="sidebarCollapse" class="btn">
+    <nav class="navbar navbar-expand-lg fixed-top" style="background-color: #9cd4ff;">
+        <button id="sidebarCollapse" class="btn" 
+            style="color: black; border: 2px solid black; background-color: transparent;">
             ☰
         </button>
-        <a class="navbar-brand ml-2" href="{% url 'sales_data_list' %}">
-            <img src="{% static 'images/eAccountE.jpeg' %}" class="navbar-logo" alt="Logo">
+
+    <a class="navbar-brand ml-2" href="{% url 'sales_data_list' %}">
+            <img src="{% static 'images/ea.png' %}" class="navbar-logo" alt="Logo">
         </a>        
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -104,7 +123,7 @@
 
     <!-- Sidebar -->
     <div id="sidebar">
-        <div class="sidebar-header">Dashboard</div>
+        {% comment %} <div class="sidebar-header">Dashboard</div> {% endcomment %}
         <ul class="nav flex-column">
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'sales_data_list' %}">📊 Sales Data</a>
@@ -128,6 +147,14 @@
     <div id="content" class="content-expanded" style="margin-top: 70px;">
         {% block content %}{% endblock %}
     </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-2" style="background-color: #9cd4ff; color: #000; font-size: 14px;">
+        E-BIT USA INC
+    </footer>
+
+
+
 
 
     <!-- Bootstrap JS and dependencies -->

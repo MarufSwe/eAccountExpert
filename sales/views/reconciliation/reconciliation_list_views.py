@@ -40,8 +40,8 @@ def reconciliation_list(request, sales_data_id):
 
     # Query all slicer lists to display in the template
     slicer_lists = SlicerList.objects.all()
-    for slicer in slicer_lists:
-        print("slicer.name------:", slicer.name)
+    # for slicer in slicer_lists:
+    #     print("slicer.name------:", slicer.name)
         
     cat_list_d = CatListD.objects.all()
     cat_list_c = CatListC.objects.all()
