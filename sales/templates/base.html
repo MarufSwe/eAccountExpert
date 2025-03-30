@@ -1,0 +1,199 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Django App{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        /* Sidebar Styling */
+        #sidebar {
+            min-width: 250px;
+            max-width: 250px;
+            height: 100vh;
+            position: fixed;
+            background: #9cd4ff;
+            color: white;
+            transition: all 0.3s;
+            padding-top: 20px;
+        }
+        #sidebar .nav-link {
+            color: white;
+        }
+        #sidebar .nav-link:hover {
+            background: #9cd4ff;
+        }
+        #sidebar .sidebar-header {
+            padding: 10px;
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            background: #9cd4ff;
+        }
+        .sidebar-collapsed {
+            margin-left: -250px;
+        }
+        
+        /* Main Content Area */
+        #content {
+            transition: margin-left 0.3s;
+            padding: 20px;
+            width: 100%;
+        }
+        .content-expanded {
+            margin-left: 250px;
+        }
+        
+        /* Toggle Button */
+        #sidebarCollapse {
+            background: #9cd4ff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+        }
+        #sidebarCollapse:hover {
+            background: #9cd4ff;
+        }
+        
+        #sidebar .nav-link {
+            color: black !important; /* Set text color to black */
+            font-weight: bold !important; /* Make the text bold */
+        }
+        
+        #sidebar .nav-link:hover {
+            background: #495057; /* Keep hover effect */
+        }
+        
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            color: hsl(206deg 100% 80.6%)
+        }
+        
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg fixed-top" style="background-color: #9cd4ff;">
+        <button id="sidebarCollapse" class="btn" 
+            style="color: black; border: 2px solid black; background-color: transparent;">
+            ☰
+        </button>
+
+    <a class="navbar-brand ml-2" href="{% url 'sales_data_list' %}">
+            <img src="{% static 'images/ea.png' %}" class="navbar-logo" alt="Logo">
+        </a>        
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                {% if user.is_authenticated and request.resolver_match.url_name not in "login register" %}
+                    <!-- Profile Dropdown -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <img src="{% static 'images/admin.png' %}" class="rounded-circle" width="30" height="30" alt="Profile">
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="">Profile</a>
+                            <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                        </div>
+                    </li>
+                {% elif request.resolver_match.url_name != "login" and request.resolver_match.url_name != "register" %}
+                    <!-- Show Login Button Only if NOT on Login/Register Page -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">Login</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+        {% comment %} <div class="sidebar-header">Dashboard</div> {% endcomment %}
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'sales_data_list' %}">📊 Sales Data</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'slicer_list' %}">📦 Slicer List</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'catlistd_list' %}">📦 Cat List D</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'catlistc_list' %}">🛒 Cat List C</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">⚙️ Settings</a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content Area -->
+    <div id="content" class="content-expanded" style="margin-top: 70px;">
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-center py-2" style="background-color: #9cd4ff; color: #000; font-size: 14px;">
+        E-BIT USA INC
+    </footer>
+
+
+
+
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Sidebar Toggle Script -->
+    {% comment %} <script>
+        $(document).ready(function() {
+            $("#sidebarCollapse").on("click", function() {
+                $("#sidebar").toggleClass("sidebar-collapsed");
+                $("#content").toggleClass("content-expanded");
+            });
+        });
+    </script> {% endcomment %}
+    
+    {% comment %} off sidebar until click the "=" button {% endcomment %}
+    <script>
+        $(document).ready(function() {
+            // Check localStorage for sidebar state
+            if (localStorage.getItem("sidebarCollapsed") === "true") {
+                $("#sidebar").addClass("sidebar-collapsed");
+                $("#content").removeClass("content-expanded");
+            }
+    
+            // Toggle sidebar on button click
+            $("#sidebarCollapse").on("click", function() {
+                $("#sidebar").toggleClass("sidebar-collapsed");
+                $("#content").toggleClass("content-expanded");
+    
+                // Save state to localStorage
+                if ($("#sidebar").hasClass("sidebar-collapsed")) {
+                    localStorage.setItem("sidebarCollapsed", "true");
+                } else {
+                    localStorage.setItem("sidebarCollapsed", "false");
+                }
+            });
+        });
+    </script>
+    
+</body>
+</html>

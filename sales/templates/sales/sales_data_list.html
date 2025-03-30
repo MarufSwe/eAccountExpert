@@ -1,99 +1,17 @@
-{% comment %} <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales Data</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        .scrollable-box {
-            max-height: 300px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 5px;
-            background-color: #f8f9fa;
-        }
-        .table th, .table td {
-            white-space: nowrap;
-        }
-    </style>
-</head>
-<body>
-    <div class="container mt-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>📊 Sales Data</h2>
-            <a href="{% url 'upload_sales_data' %}" class="btn btn-success">📤 Upload New File</a>
-        </div>
+{% extends "base.html" %}
+{% load static %}
 
-        {% for sales in sales_data %}
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">{{ sales.shop.name }} (📅 {{ sales.date_uploaded }})</h5>
-                </div>
-                <div class="card-body">
-                    {% if sales.data %}
-                        <div class="scrollable-box">
-                            <table class="table table-sm table-bordered table-striped">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        {% for key in sales.data.0.keys %}
-                                            <th>{{ key|capfirst }}</th>
-                                        {% endfor %}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for record in sales.data %}
-                                        <tr>
-                                            {% for value in record.values %}
-                                                <td>{{ value }}</td>
-                                            {% endfor %}
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <p class="text-muted">No data available.</p>
-                    {% endif %}
-                </div>
-            </div>
-        {% empty %}
-            <p class="alert alert-warning text-center">No sales data available.</p>
-        {% endfor %}
-    </div>
-</body>
-</html> {% endcomment %}
+{% block title %}Dashboard{% endblock %}
 
+{% block content %}
 
+<style>
+    .scrollable-box {
+        max-height: 300px;
+        overflow-y: auto;
+    }
+</style>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales Data</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        .sticky-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: #17a2b8; /* Lighter blue background */
-            color: white;
-            padding: 10px 20px;
-            z-index: 1000;
-        }
-        .content {
-            padding: 80px 20px 20px; /* Adjust for fixed header */
-        }
-        .scrollable-box {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-    </style>
-</head>
 <body>
     <div class="sticky-header d-flex justify-content-between align-items-center">
         <h4 class="mb-0">📊 Sales Data</h4>
@@ -102,10 +20,28 @@
     
     <div class="content">
         {% for sales in sales_data %}
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header bg-info text-white">
+            <div class="card mb-2 mt-2 shadow-sm">
+
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #343a40; color: white;">
                     <h5 class="mb-0">{{ sales.shop.name }} (📅 {{ sales.date_uploaded }})</h5>
+                    
+                    <div>
+                        <!-- Reconcile Button (Disabled if already reconciled) -->
+                        {% if sales.is_reconciled %}
+                            <button class="btn btn-secondary" disabled>✔ Reconciled</button>
+                        {% else %}
+                            <button class="btn btn-warning reconcile-btn" data-record-id="{{ sales.id }}" onclick="reconcileSales({{ sales.id }})">
+                                🔄 Reconcile
+                            </button>
+                        {% endif %}
+                        
+                        <!-- View Reconciliation List Button -->
+                        <a href="{% url 'reconciliation_list' sales.id %}" class="btn btn-primary ml-2">
+                            📋 View Reconciliation List
+                        </a>
+                    </div>
                 </div>
+                
                 <div class="card-body">
                     {% if sales.data %}
                         <div class="scrollable-box">
@@ -138,4 +74,112 @@
         {% endfor %}
     </div>
 </body>
-</html>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll(".reconcile-btn").forEach(button => {
+                button.addEventListener("click", function() {
+                    const recordId = this.getAttribute("data-record-id");
+                    fetch(`/reconcile/${recordId}/`, {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": "{{ csrf_token }}",
+                            "Content-Type": "application/json"
+                        },
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("✅ Reconciliation successful!");
+                        } else {
+                            alert("❌ Error: " + data.error);
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+                });
+            });
+        });
+    </script>
+        
+    <script>
+        function reconcileSales(salesId) {
+            // Send the reconcile request via AJAX
+            fetch(`/reconcile/${salesId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Disable the reconcile button and change the button text to "✔ Reconciled"
+                    const button = document.querySelector(`button[data-record-id='${salesId}']`);
+                    if (button) {
+                        button.disabled = true;
+                        button.innerText = '✔ Reconciled';
+                    }
+                    // Optionally reload the page to reflect changes immediately
+                    location.reload();
+                } else {
+                    alert(data.error || 'Reconciliation failed. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again later.');
+            });
+        }
+    </script>
+
+    <script>
+        function reconcileSales(salesId) {
+            // Find the button and replace it with the loading spinner
+            const button = document.querySelector(`button[data-record-id='${salesId}']`);
+            if (button) {
+                // Show the loader (🔄) while reconciliation is happening
+                button.disabled = true;  // Disable the button to prevent multiple clicks
+                button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
+            }
+    
+            // Send the reconcile request via AJAX
+            fetch(`/reconcile/${salesId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Change button to "✔ Reconciled" once reconciliation is done
+                    if (button) {
+                        button.innerHTML = '✔ Reconciled';
+                        button.disabled = true;
+                    }
+                    // Optionally reload the page to reflect changes immediately
+                    location.reload();
+                } else {
+                    alert(data.error || 'Reconciliation failed. Please try again.');
+                    // Reset the button to its original state if failed
+                    if (button) {
+                        button.innerHTML = '🔄 Reconcile';
+                        button.disabled = false;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again later.');
+                // Reset the button to its original state if there was an error
+                if (button) {
+                    button.innerHTML = '🔄 Reconcile';
+                    button.disabled = false;
+                }
+            });
+        }
+    </script>
+    
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Reconciliation List{% endblock %}
+
+{% block content %}
+
+<style>
+    .truncate-text {
+        max-width: 200px; /* Adjust as needed */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+</style>
+
+<div class="sticky-header d-flex justify-content-between align-items-center">
+    <h4 class="mb-0">📊 Reconciliation List for {{ sales_data.shop.name }} (📅 {{ sales_data.date_uploaded }})</h4>
+    <a href="{% url 'sales_data_list' %}" class="btn btn-light">📋 Back to Sales Data</a>
+</div>
+
+<div class="content mt-4">
+    {% if reconciliations %}
+    <table class="table table-sm table-bordered table-striped">
+        <thead class="thead-light">
+            <tr>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Slicer New</th>
+                <th>Category New</th>
+                <th>Credit Amount</th>
+                <th>Debit Amount</th>
+                <th>Slicer List</th>
+                <th>Cat List D</th>
+                <th>Cat List C</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for reconciliation in reconciliations %}
+                <tr>
+                    <td class="truncate-text" title="{{ reconciliation.description }}">
+                        {{ reconciliation.description|slice:":100" }}...
+                    </td>                    
+                    <td>{{ reconciliation.amount }}</td>
+                    <td>{{ reconciliation.slicer_new }}</td>
+                    <td>{{ reconciliation.category_new }}</td>
+                    <td>{{ reconciliation.credit_amount }}</td>
+                    <td>
+                        {% if reconciliation.debit_amount > 0 %}
+                            - {{ reconciliation.debit_amount }}
+                        {% else %}
+                            {{ reconciliation.debit_amount }}
+                        {% endif %}
+                    </td>
+
+                    {% comment %} for 3 forign key values {% endcomment %}
+                    
+                    <td>
+                        {% if reconciliation.slicer %}
+                            {{ reconciliation.slicer.name }}
+                        {% else %}
+                            Slicer
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if reconciliation.slicer %}
+                            {{ reconciliation.slicer.name }}
+                        {% else %}
+                        Cat List D
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if reconciliation.slicer %}
+                            {{ reconciliation.slicer.name }}
+                        {% else %}
+                        Cat List C
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% else %}
+        <p class="alert alert-warning text-center">No reconciliations available for this Sales Data.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

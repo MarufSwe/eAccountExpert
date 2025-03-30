@@ -4,10 +4,12 @@ from ..models import Shop, SalesData
 import pandas as pd
 from django.db.utils import IntegrityError
 from django.views.generic import ListView
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 import pdfplumber
 
-class SalesDataListView(ListView):
+class SalesDataListView(LoginRequiredMixin, ListView):
     model = SalesData
     template_name = 'sales/sales_data_list.html'
     context_object_name = 'sales_data'
@@ -15,9 +17,6 @@ class SalesDataListView(ListView):
     def get_queryset(self):
         queryset = SalesData.objects.all().order_by('shop', 'date_uploaded')
         
-        # # Debugging: Print the sales data to see the structure
-        # for sales in queryset:
-        #     print(sales.data)  # This will print the data in the terminal/log
         return queryset
 
 
