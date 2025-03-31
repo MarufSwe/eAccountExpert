@@ -6,6 +6,36 @@
 {% block content %}
 
 <style>
+    /* General table styling */
+    .table {
+        font-family: Arial, sans-serif; /* Change to your preferred font */
+        font-size: 14px; /* Adjust font size */
+    }
+
+    /* Table header styling */
+    .table thead th {
+        background-color: #f8f9fa; /* Light gray background */
+        font-weight: bold;
+        font-size: 16px; /* Slightly larger font for headers */
+    }
+
+    /* Table body styling */
+    .table tbody td {
+        font-size: 13px; /* Adjust text size for better readability */
+        padding: 8px; /* Add padding for spacing */
+    }
+
+    /* Truncate long text in description */
+    .truncate-text {
+        max-width: 200px; 
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+</style>
+
+
+<style>
     .truncate-text {
         max-width: 200px; /* Adjust as needed */
         white-space: nowrap;
