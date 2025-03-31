@@ -10,12 +10,28 @@
         max-height: 300px;
         overflow-y: auto;
     }
+
+    /*Upload New File Button*/
+    @keyframes shimmer {
+        0% { background-position: -200px 0; }
+        100% { background-position: 200px 0; }
+    }
+    
+    .shimmer-btn {
+        background: linear-gradient(90deg,rgb(64, 140, 216) 25%,rgb(255, 255, 255) 50%,rgb(80, 151, 231) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite linear;
+    }
+    
+    
 </style>
 
 <body>
     <div class="sticky-header d-flex justify-content-between align-items-center">
         <h4 class="mb-0">📊 Sales Data</h4>
-        <a href="{% url 'upload_sales_data' %}" class="btn btn-light">📤 Upload New File</a>
+        {% comment %} <a href="{% url 'upload_sales_data' %}" class="btn btn-light">📤 Upload New File</a> {% endcomment %}
+        <a href="{% url 'upload_sales_data' %}" class="btn btn-light shimmer-btn">📤 Upload New File</a>
+
     </div>
     
     <div class="content">
@@ -70,7 +86,7 @@
                 </div>
             </div>
         {% empty %}
-            <p class="alert alert-warning text-center">No data available.</p>
+            <p class="alert alert-warning text-center mt-4">No data available.</p>
         {% endfor %}
     </div>
 </body>
