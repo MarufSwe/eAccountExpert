@@ -6,23 +6,27 @@
 {% block content %}
 
 <style>
-    /* General table styling */
-    .table {
-        font-family: Arial, sans-serif; /* Change to your preferred font */
-        font-size: 14px; /* Adjust font size */
-    }
+    /* Make the table header sticky */
+.table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #f8f9fa; /* Light gray background */
+    font-weight: bold;
+    font-size: 16px;
+    z-index: 2;
+}
 
-    /* Table header styling */
-    .table thead th {
-        background-color: #f8f9fa; /* Light gray background */
-        font-weight: bold;
-        font-size: 16px; /* Slightly larger font for headers */
-    }
+/* Add a container to control the table height */
+.table-container {
+    max-height: 500px; /* Adjust this height as needed */
+    overflow-y: auto; /* Enable vertical scrolling */
+    border: 1px solid #ddd; /* Optional: Add a border */
+}
 
     /* Table body styling */
     .table tbody td {
         font-size: 13px; /* Adjust text size for better readability */
-        padding: 8px; /* Add padding for spacing */
+        padding: 2px; /* Add padding for spacing */
     }
 
     /* Truncate long text in description */
@@ -40,51 +44,48 @@
     <a href="{% url 'sales_data_list' %}" class="btn btn-light">📋 Back to Sales Data</a>
 </div>
 
-<div class="content mt-4">
+<div class="table-container">
     {% if reconciliations %}
-    <table class="table table-sm table-bordered table-striped">
-        <thead class="thead-light">
-            <tr>
-                <th>Description</th>
-                <th>Amount</th>
-                <th>Slicer New</th>
-                <th>Category New</th>
-                <th>Credit Amount</th>
-                <th>Debit Amount</th>
-                <th>Slicer List</th>
-                <th>Cat List D</th>
-                <th>Cat List C</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for reconciliation in reconciliations %}
+        <table class="table table-sm table-bordered table-striped">
+            <thead class="thead-light">
                 <tr>
-                    <td class="truncate-text" title="{{ reconciliation.description }}">
-                        {{ reconciliation.description|slice:":100" }}...
-                    </td>                    
-                    <td>{{ reconciliation.amount }}</td>
-                    <td>{{ reconciliation.slicer_new }}</td>
-                    <td>{{ reconciliation.category_new }}</td>
-                    <td>{{ reconciliation.credit_amount }}</td>
-                    <td>
-                        {% if reconciliation.debit_amount > 0 %}
-                            - {{ reconciliation.debit_amount }}
-                        {% else %}
-                            {{ reconciliation.debit_amount }}
-                        {% endif %}
-                    </td>
-
-                    {% comment %} for 3 forign key values {% endcomment %}
-                    <td>{{ reconciliation.slicer_list_name }}</td>  <!-- Display random slicer list -->
-                    <td>{{ reconciliation.cat_list_d_name }}</td>  <!-- Display random cat list D -->
-                    <td>{{ reconciliation.cat_list_c_name }}</td>  <!-- Display random cat list C -->
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Slicer New</th>
+                    <th>Category New</th>
+                    <th>Credit Amount</th>
+                    <th>Debit Amount</th>
+                    <th>Slicer List</th>
+                    <th>Cat List D</th>
+                    <th>Cat List C</th>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    
+            </thead>
+            <tbody>
+                {% for reconciliation in reconciliations %}
+                    <tr>
+                        <td class="truncate-text" title="{{ reconciliation.description }}">
+                            {{ reconciliation.description|slice:":100" }}...
+                        </td>                    
+                        <td>{{ reconciliation.amount }}</td>
+                        <td>{{ reconciliation.slicer_new }}</td>
+                        <td>{{ reconciliation.category_new }}</td>
+                        <td>{{ reconciliation.credit_amount }}</td>
+                        <td>
+                            {% if reconciliation.debit_amount > 0 %}
+                                - {{ reconciliation.debit_amount }}
+                            {% else %}
+                                {{ reconciliation.debit_amount }}
+                            {% endif %}
+                        </td>
+                        <td>{{ reconciliation.slicer_list_name }}</td>
+                        <td>{{ reconciliation.cat_list_d_name }}</td>
+                        <td>{{ reconciliation.cat_list_c_name }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     {% else %}
-        <p class="alert alert-warning text-center">No reconciliations available for this Sales Data.</p>
+        <p class="alert alert-warning text-center mt-3">No reconciliations available.</p>
     {% endif %}
 </div>
 
