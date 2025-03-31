@@ -43,27 +43,21 @@
         }
         
         /* Main Content Area */
+        /* Adjust main content dynamically based on sidebar */
         #content {
             transition: margin-left 0.3s;
             padding: 20px;
-            width: 100%;
+            width: calc(100% - 250px); /* Adjust width automatically */
+            margin-left: 250px; /* Default margin to fit sidebar */
+            overflow-x: hidden; /* Prevent horizontal scrolling */
         }
-        .content-expanded {
-            margin-left: 250px;
+
+        /* When sidebar is collapsed */
+        .sidebar-collapsed ~ #content {
+            width: 100%; /* Take full width when sidebar is hidden */
+            margin-left: 0;
         }
-        
-        /* Toggle Button */
-        #sidebarCollapse {
-            background: #9cd4ff;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            cursor: pointer;
-        }
-        #sidebarCollapse:hover {
-            background: #9cd4ff;
-        }
-        
+
         #sidebar .nav-link {
             color: black !important; /* Set text color to black */
             font-weight: bold !important; /* Make the text bold */

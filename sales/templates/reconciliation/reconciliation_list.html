@@ -35,16 +35,6 @@
 </style>
 
 
-<style>
-    .truncate-text {
-        max-width: 200px; /* Adjust as needed */
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    
-</style>
-
 <div class="sticky-header d-flex justify-content-between align-items-center">
     <h4 class="mb-0">📊 Reconciliation List for {{ sales_data.shop.name }} (📅 {{ sales_data.date_uploaded }})</h4>
     <a href="{% url 'sales_data_list' %}" class="btn btn-light">📋 Back to Sales Data</a>
