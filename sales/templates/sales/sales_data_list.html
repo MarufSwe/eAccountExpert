@@ -18,11 +18,17 @@
     }
     
     .shimmer-btn {
-        background: linear-gradient(90deg,rgb(64, 140, 216) 25%,rgb(255, 255, 255) 50%,rgb(80, 151, 231) 75%);
+        background: linear-gradient(90deg,rgb(183, 212, 241) 25%,rgb(255, 255, 255) 50%,rgb(167, 202, 241) 75%);
         background-size: 200% 100%;
         animation: shimmer 1.5s infinite linear;
     }
-    
+
+    .btn-secondary:disabled {
+        background-color: #6c757d !important; /* Dark gray */
+        color: white !important; /* White text */
+        opacity: 1 !important; /* Ensure full visibility */
+        cursor: not-allowed;
+    }
     
 </style>
 
@@ -44,7 +50,7 @@
                     <div>
                         <!-- Reconcile Button (Disabled if already reconciled) -->
                         {% if sales.is_reconciled %}
-                            <button class="btn btn-secondary" disabled>✔ Reconciled</button>
+                            <button class="btn btn-secondary" disabled>✅ Reconciled</button>
                         {% else %}
                             <button class="btn btn-warning reconcile-btn" data-record-id="{{ sales.id }}" onclick="reconcileSales({{ sales.id }})">
                                 🔄 Reconcile
