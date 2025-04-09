@@ -15,15 +15,20 @@ def reconcile_sales_data(request, sales_data_id):
 
         # Extract "Description" and "Amount" from JSON field and insert into Reconciliation table
         for record in sales_data.data:
-            description = record.get("Description", "")  # Extract description
+            description = record.get("Description", "").strip().lower()  # Normalize description (trim and lower case)
             amount = Decimal(record.get("Amount", "0"))  # Extract amount
 
-            # Insert into Reconciliation table and associate with SalesData
-            Reconciliation.objects.create(
-                description=description,
-                amount=amount,
-                sales_data=sales_data  # Link to the SalesData entry
-            )
+            # Check if a reconciliation record with the same normalized description and amount already exists
+            if not Reconciliation.objects.filter(
+                description__iexact=description, amount=amount, sales_data=sales_data).exists():
+                # Insert into Reconciliation table and associate with SalesData
+                Reconciliation.objects.create(
+                    description=description,
+                    amount=amount,
+                    sales_data=sales_data  # Link to the SalesData entry
+                )
+            # else:
+            #     print(f"Skipping duplicate: {description} with amount {amount}")
 
         # Mark SalesData as reconciled
         sales_data.is_reconciled = True

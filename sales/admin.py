@@ -40,7 +40,7 @@ admin.site.register(CatListC, CatListCAdmin)
 
 @admin.register(Reconciliation)
 class ReconciliationAdmin(admin.ModelAdmin):
-    list_display = ("sales_data", "description", "amount", "credit_amount", "debit_amount", "slicer_new", "category_new")
+    list_display = ('id', "sales_data", "description", "amount", "credit_amount", "debit_amount", "slicer_new", "category_new")
     search_fields = ("amount",)
     list_filter = ("credit_amount", "debit_amount")
 
