@@ -1,11 +1,22 @@
+
+
+
 {% extends 'base.html' %}
 {% block content %}
 <div class="container mt-4">
+    
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="mb-0">Slicer List</h2>
-        <a href="{% url 'slicer_add' %}" class="btn btn-success">+ Add New Slicer</a>
+        <h2 class="mb-0">Category Mapping List</h2>
+    
+        <form method="get" class="d-flex mx-3" style="flex-grow: 1; max-width: 400px;">
+            <input type="text" name="search" value="{{ search_query }}" class="form-control me-2" placeholder="Search by Slicer, Cat-D or Cat-C" />
+            <button type="submit" class="btn btn-light"><i class="fas fa-search"></i></button>
+        </form>
+    
+        <a href="{% url 'category_mapping_create' %}" class="btn btn-outline-primary">+ Add Category Mapping</a>
     </div>
-
+    
+    
     <!-- Table CSS to reduce row height -->
     <style>
         .table th, .table td {
@@ -17,21 +28,26 @@
     <table class="table table-bordered table-striped">
         <thead class="thead-dark">
             <tr>
-                <th>#</th>
-                <th>Name</th>
+                <th>Slicer List</th>
+                <th>Cat List D</th>
+                <th>Cat List C</th>
                 <th style="width: 150px;">Actions</th>
             </tr>
         </thead>
         <tbody>
-            {% for item in items %}
+            {% for mapping in mappings %}
             <tr>
-                <td>{{ forloop.counter }}</td>
-                <td>{{ item.name }}</td>
+                <td>{{ mapping.slicer_list }}</td>
+                <td>{{ mapping.cat_list_d }}</td>
+                <td>{{ mapping.cat_list_c }}</td>
+
                 <td>
-                    <a href="{% url 'slicer_edit' item.pk %}" class="btn btn-warning btn-sm" target="">
+
+                    <a href="{% url 'category_mapping_update' mapping.pk %}" class="btn btn-warning btn-sm" target="">
                         <i class="fa-solid fa-pen-to-square"></i> <!-- Font Awesome 6 Edit Icon -->
                     </a>
-                    <a class="btn btn-danger btn-sm" onclick="confirmDelete({{ item.pk }})">
+
+                    <a class="btn btn-danger btn-sm" onclick="confirmDelete({{ mapping.pk }})">
                         <i class="fa-solid fa-trash"></i> <!-- Font Awesome 6 Trash Icon -->
                     </a>
                 </td>
@@ -53,7 +69,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete this slicer?
+                Are you sure you want to delete this category mapping?
             </div>
             <div class="modal-footer">
                 <form id="deleteForm" method="post">
@@ -69,7 +85,7 @@
 <script>
     function confirmDelete(itemId) {
         let deleteForm = document.getElementById("deleteForm");
-        deleteForm.action = "/slicer/delete/" + itemId + "/";
+        deleteForm.action = "/category-mapping/delete/" + itemId + "/";
         $("#deleteModal").modal("show");
     }
 </script>

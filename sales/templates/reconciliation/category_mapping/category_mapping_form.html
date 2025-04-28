@@ -1,19 +1,19 @@
 {% extends 'base.html' %}
 {% block content %}
 <div class="container mt-4">
-    <h2 class="mb-4">{% if form.instance.pk %}Edit Slicer{% else %}Add New Slicer{% endif %}</h2>
+    <h2 class="mb-4">{% if form.instance.pk %}Edit Category Mapping{% else %}Add New Category Mapping{% endif %}</h2>
 
     <div class="card">
         <div class="card-body">
+
             <form method="post">
                 {% csrf_token %}
                 <div class="form-group">
-                    <label for="name">Slicer Name</label>
-                    {{ form.name }}
+                    {{ form.as_p }}
                 </div>
                 <button type="submit" class="btn btn-primary">{% if form.instance.pk %}Update{% else %}Create{% endif %}</button>
-                <a href="{% url 'slicer_list' %}" class="btn btn-secondary">Cancel</a>
-            </form>
+                <a href="{% url 'category_mapping_list' %}" class="btn btn-secondary">Cancel</a>
+            </form>            
         </div>
     </div>
 </div>

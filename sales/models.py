@@ -29,43 +29,32 @@ class SalesData(models.Model):
 
 
 # For Reconcilation
-class SlicerList(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+# class SlicerList(models.Model):
+#     name = models.CharField(max_length=255, unique=True)
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
 
-class CatListD(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+# class CatListD(models.Model):
+#     name = models.CharField(max_length=255, unique=True)
 
-    def __str__(self):
-        return self.name
+#     def __str__(self):
+#         return self.name
     
-class CatListC(models.Model):
-    name = models.CharField(max_length=255, unique=True)
+# class CatListC(models.Model):
+#     name = models.CharField(max_length=255, unique=True)
+
+#     def __str__(self):
+#         return self.name
+
+
+class CategoryMapping(models.Model):
+    slicer_list = models.CharField(max_length=255)
+    cat_list_d = models.CharField(max_length=255)
+    cat_list_c = models.CharField(max_length=255)
 
     def __str__(self):
-        return self.name
-    
-
-# class ReconciliationData(models.Model):
-#     description = models.TextField()
-#     amount = models.DecimalField(max_digits=10, decimal_places=2)
-
-#     credit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-#     debit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-
-#     def save(self, *args, **kwargs):
-#         # Automatically assign Credit or Debit Amount based on Amount
-#         if self.amount > 0:
-#             self.credit_amount = self.amount
-#             self.debit_amount = 0
-#         else:
-#             self.debit_amount = abs(self.amount)
-#             self.credit_amount = 0
-
-#         super().save(*args, **kwargs)
-
+        return self.slicer_list
 
 class Reconciliation(models.Model):
     description = models.TextField()  # Description field
@@ -76,9 +65,10 @@ class Reconciliation(models.Model):
     debit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     # ForeignKey relationships to your Slicer_List, Cat_List_d, and Cat_List_c
-    slicer_list = models.ForeignKey(SlicerList, on_delete=models.SET_NULL, null=True, blank=True)
-    cat_list_d = models.ForeignKey(CatListD, on_delete=models.SET_NULL, null=True, blank=True)
-    cat_list_c = models.ForeignKey(CatListC, on_delete=models.SET_NULL, null=True, blank=True)
+    category_mapping = models.ForeignKey(CategoryMapping, on_delete=models.SET_NULL, null=True, blank=True)
+    # slicer_list = models.ForeignKey(SlicerList, on_delete=models.SET_NULL, null=True, blank=True)
+    # cat_list_d = models.ForeignKey(CatListD, on_delete=models.SET_NULL, null=True, blank=True)
+    # cat_list_c = models.ForeignKey(CatListC, on_delete=models.SET_NULL, null=True, blank=True)
 
     # ForeignKey to link Reconciliation to the SalesData entry
     sales_data = models.ForeignKey(SalesData, on_delete=models.CASCADE)

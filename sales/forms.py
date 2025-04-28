@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Shop, SlicerList, CatListD, CatListC
+from .models import Shop, CategoryMapping
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -25,29 +25,12 @@ class ShopForm(forms.ModelForm):
         fields = ['name', 'location', 'owner_name', 'contact_number']
 
 
-class SlicerListForm(forms.ModelForm):
+class CategoryMappingForm(forms.ModelForm):
     class Meta:
-        model = SlicerList
-        fields = ['name']
-
-    def __init__(self, *args, **kwargs):
-        super(SlicerListForm, self).__init__(*args, **kwargs)
-        self.fields['name'].initial = ""  # Set the initial value to an empty string instead of None
-
-class CatListDForm(forms.ModelForm):
-    class Meta:
-        model = CatListD
-        fields = ['name']
-
-    def __init__(self, *args, **kwargs):
-        super(CatListDForm, self).__init__(*args, **kwargs)
-        self.fields['name'].initial = ""  # Set the initial value to an empty string
-
-class CatListCForm(forms.ModelForm):
-    class Meta:
-        model = CatListC
-        fields = ['name']
-
-    def __init__(self, *args, **kwargs):
-        super(CatListCForm, self).__init__(*args, **kwargs)
-        self.fields['name'].initial = ""  # Set the initial value to an empty string
+        model = CategoryMapping
+        fields = ['slicer_list', 'cat_list_d', 'cat_list_c']
+        labels = {
+            'slicer_list': 'Slicer name',
+            'cat_list_d': 'Cat list D',
+            'cat_list_c': 'Cat list C',
+        }

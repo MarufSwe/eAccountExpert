@@ -123,14 +123,15 @@
                 <a class="nav-link" href="{% url 'sales_data_list' %}">📊 Sales Data</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="{% url 'slicer_list' %}">📦 Slicer List</a>
+                <a class="nav-link" href="{% url 'category_mapping_list' %}">📦 Category Mapping</a>
             </li>
-            <li class="nav-item">
+            
+            {% comment %} <li class="nav-item">
                 <a class="nav-link" href="{% url 'catlistd_list' %}">📦 Cat List D</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'catlistc_list' %}">🛒 Cat List C</a>
-            </li>
+            </li> {% endcomment %}
             <li class="nav-item">
                 <a class="nav-link" href="{% url 'shop_list' %}">🛍️ Shop List</a>
             </li>            
