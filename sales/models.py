@@ -57,10 +57,10 @@ class CategoryMapping(models.Model):
         return self.slicer_list
 
 class Reconciliation(models.Model):
-    description = models.TextField()  # Description field
-    amount = models.DecimalField(max_digits=10, decimal_places=2)  # Amount field
-    slicer_new = models.TextField(blank=True, null=True)  # Placeholder for future logic
-    category_new = models.TextField(blank=True, null=True)  # Placeholder for future logic
+    description = models.TextField()  
+    amount = models.DecimalField(max_digits=10, decimal_places=2)  
+    slicer_new = models.TextField(blank=True, null=True)  
+    category_new = models.TextField(blank=True, null=True)
     credit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     debit_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
@@ -89,3 +89,5 @@ class Reconciliation(models.Model):
 
     class Meta:
         db_table = "reconciliation"
+        unique_together = ('sales_data', 'description', 'amount')
+

@@ -50,7 +50,7 @@
         <table class="table table-sm table-bordered table-striped">
             <thead class="thead-light">
                 <tr>
-                    {% comment %} <th>No</th> {% endcomment %}
+                    <th>No</th>
                     <th>Description</th>
                     <th>Amount</th>
                     <th>Slicer New</th>
@@ -65,7 +65,7 @@
             <tbody>
                 {% for reconciliation in reconciliations %}
                     <tr>
-                        {% comment %} <td>{{ forloop.counter }}</td> {% endcomment %}
+                        <td>{{ forloop.counter }}</td>
                         <td class="truncate-text" title="{{ reconciliation.description }}">
                             {{ reconciliation.description|slice:":150" }}...
                         </td>                    
