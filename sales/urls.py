@@ -10,7 +10,7 @@ from .views.shop_views import shop_list, shop_create
 
 
 urlpatterns = [
-    path('', register, name='register'),
+    path('register/', register, name='register'),
     path('login/', user_login, name='login'),
     path('logout/', user_logout, name='logout'),
 
