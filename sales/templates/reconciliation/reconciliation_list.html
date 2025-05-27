@@ -40,56 +40,124 @@
 </style>
 
 
-<div class="sticky-header d-flex justify-content-between align-items-center mb-2">
-    <h4 class="mb-0">📊 Reconciliation List for {{ sales_data.shop.name }} (📅 {{ sales_data.date_uploaded }})</h4>
-    <a href="{% url 'sales_data_list' %}" class="btn btn-light">📋 Back to Sales Data</a>
+<div class="sticky-header d-flex justify-content-between align-items-center mb-3 p-3 bg-light border rounded shadow-sm">
+    <h4 class="mb-0 text-primary fw-bold" style="font-size: 1.4rem;">
+        <i class="fas fa-chart-bar me-2"></i>
+        Reconciliation List for <span class="text-dark">{{ sales_data.shop.name }}</span> 
+        <small class="text-muted">(📅 {{ sales_data.date_uploaded }})</small>
+    </h4>
+    <a href="{% url 'sales_data_list' %}" class="btn btn-outline-primary btn-sm shadow-sm">
+        <i class="fas fa-clipboard-list me-1"></i> Back to Sales Data
+    </a>
 </div>
 
-<div class="table-container mb-1">
+
+<!-- Pivot Summary Section -->
+{% if pivot_summary %}
+<div class="row mb-3">
+    <!-- Reconciled Summary Card -->
+    <div class="col-md-6">
+        <div class="card border-success" style="font-size: 0.875rem;">
+            <div class="card-header bg-success text-white font-weight-bold py-2 px-3">
+                <i class="fas fa-check-circle mr-2"></i> Reconciled Summary
+            </div>
+                <div class="card-body py-2 px-3">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Total Debit (Dr)</th>
+                            <td class="text-right text-success font-weight-bold">
+                                {{ pivot_summary.reconciled.dr }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Total Credit (Cr)</th>
+                            <td class="text-right text-success font-weight-bold">
+                                {{ pivot_summary.reconciled.cr }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unreconciled Summary Card -->
+    <div class="col-md-6">
+        <div class="card border-danger" style="font-size: 0.875rem;">
+            <div class="card-header bg-danger text-white font-weight-bold py-2 px-3">
+                <i class="fas fa-exclamation-triangle mr-2"></i> Unreconciled Summary
+            </div>
+            <div class="card-body py-2 px-3">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Total Debit (Dr)</th>
+                            <td class="text-right text-danger font-weight-bold">
+                                {{ pivot_summary.unreconciled.dr }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">Total Credit (Cr)</th>
+                            <td class="text-right text-danger font-weight-bold">
+                                {{ pivot_summary.unreconciled.cr }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Reconciliation Table -->
+<div class="table-responsive mb-3">
     {% if reconciliations %}
-        <table class="table table-sm table-bordered table-striped">
-            <thead class="thead-light">
-                <tr>
-                    {% comment %} <th>No</th> {% endcomment %}
-                    <th>Description</th>
-                    <th>Amount</th>
-                    <th>Slicer New</th>
-                    <th>Category New</th>
-                    <th>Credit Amount</th>
-                    <th>Debit Amount</th>
-                    {% comment %} <th>Slicer List</th>
-                    <th>Cat List D</th>
-                    <th>Cat List C</th> {% endcomment %}
+        <table class="table table-sm table-bordered table-hover" style="font-size: 0.875rem;">
+            <thead class="thead-dark">
+                <tr class="text-center">
+                    <th><i class="fas fa-align-left"></i> Description</th>
+                    <th><i class="fas fa-coins"></i> Amount</th>
+                    <th><i class="fas fa-filter"></i> Slicer New</th>
+                    <th><i class="fas fa-tags"></i> Category New</th>
+                    <th><i class="fas fa-arrow-down text-success"></i> Credit (Cr)</th>
+                    <th><i class="fas fa-arrow-up text-danger"></i> Debit (Dr)</th>
                 </tr>
             </thead>
             <tbody>
                 {% for reconciliation in reconciliations %}
                     <tr>
-                        {% comment %} <td>{{ forloop.counter }}</td> {% endcomment %}
-                        <td class="truncate-text" title="{{ reconciliation.description }}">
-                            {{ reconciliation.description|slice:":150" }}...
-                        </td>                    
+                        {% comment %} <td title="{{ reconciliation.description }}">
+                            {{ reconciliation.description|slice:":80" }}{% if reconciliation.description|length > 80 %}...{% endif %}
+                        </td> {% endcomment %}
+                        
+                        <td class="text-truncate" style="max-width: 500px;" title="{{ reconciliation.description }}">
+                            {{ reconciliation.description }}
+                        </td>
                         <td>{{ reconciliation.amount }}</td>
-                        <td>{{ reconciliation.slicer_new }}</td>
-                        <td>{{ reconciliation.category_new }}</td>
-                        <td>{{ reconciliation.credit_amount }}</td>
                         <td>
+                            {% if reconciliation.slicer_new.strip %}{{ reconciliation.slicer_new }}{% else %}<span class="text-muted">N/A</span>{% endif %}
+                        </td>
+                        <td>
+                            {% if reconciliation.category_new.strip %}{{ reconciliation.category_new }}{% else %}<span class="text-muted">N/A</span>{% endif %}
+                        </td>
+                        <td class="text-success text-right">{{ reconciliation.credit_amount }}</td>
+                        <td class="text-danger text-right">
                             {% if reconciliation.debit_amount > 0 %}
-                                - {{ reconciliation.debit_amount }}
+                                -{{ reconciliation.debit_amount }}
                             {% else %}
                                 {{ reconciliation.debit_amount }}
                             {% endif %}
                         </td>
-                        {% comment %} <td>{{ reconciliation.slicer_list_name }}</td>
-                        <td>{{ reconciliation.cat_list_d_name }}</td>
-                        <td>{{ reconciliation.cat_list_c_name }}</td> {% endcomment %}
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     {% else %}
-        <p class="alert alert-warning text-center mt-3">No reconciliations available.</p>
+        <div class="alert alert-warning text-center">No reconciliations available.</div>
     {% endif %}
 </div>
+
 
 {% endblock %}
