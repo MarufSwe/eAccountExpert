@@ -130,7 +130,6 @@ def reconciliation_list(request, sales_data_id):
                 pivot_summary['reconciled']['cr'] += reconciliation.amount
             else:
                 pivot_summary['unreconciled']['cr'] += reconciliation.amount
-
     # Render the result in template
     return render(request, 'reconciliation/reconciliation_list.html', {
         'sales_data': sales_data,
