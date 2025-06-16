@@ -1,8 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from ..models import Shop
 from ..forms import ShopForm
+from django.contrib.auth.decorators import login_required
+
 
 # ✅ List all shops
+@login_required
 def shop_list(request):
     shops = Shop.objects.all()
     return render(request, 'shops/shop_list.html', {'shops': shops})
