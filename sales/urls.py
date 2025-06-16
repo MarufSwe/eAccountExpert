@@ -27,9 +27,9 @@ urlpatterns = [
     path('category-mapping/edit/<int:pk>/', category_mapping_update, name='category_mapping_update'),
     path('category-mapping/delete/<int:pk>/', category_mapping_delete, name='category_mapping_delete'),
 
-    # path('import/', import_bank_statement, name='import_bank_statement'),
+    # Reconcile button for SalseData 
     path("reconcile/<int:sales_data_id>/", reconcile_sales_data, name="reconcile_sales_data"),
-
+    # Reconciled data list
     path('sales_data/<int:sales_data_id>/reconciliation/', reconciliation_list, name='reconciliation_list'),
 
 ]
