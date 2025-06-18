@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
 
-
+# Reconcile button for SalseData (sales_data_list.html)
 @csrf_exempt
 def reconcile_sales_data(request, sales_data_id):
     if request.method == "POST":

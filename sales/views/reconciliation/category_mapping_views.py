@@ -2,13 +2,13 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Q
 from sales.forms import CategoryMappingForm
 from sales.models import CategoryMapping
-
+from django.contrib.auth.decorators import login_required
 
 # List all entries
 # def category_mapping_list(request):
 #     mappings = CategoryMapping.objects.all()
 #     return render(request, 'reconciliation/category_mapping/category_mapping_list.html', {'mappings': mappings})
-
+@login_required
 def category_mapping_list(request):
     search_query = request.GET.get('search', '')  # Get the search query from GET request by 3 fields
     if search_query:
