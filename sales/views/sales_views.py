@@ -18,6 +18,39 @@ class SalesDataListView(LoginRequiredMixin, ListView):
         queryset = SalesData.objects.all().order_by('shop', 'date_uploaded')
         
         return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Calculate reconciliation statistics
+        total_uploads = self.get_queryset().count()
+        reconciled_count = 0
+        pending_count = 0
+        
+        for sales_data in self.get_queryset():
+            # Check if this sales data is fully reconciled
+            reconciliations = sales_data.reconciliation_set.all()
+            if reconciliations.exists():
+                # Check if all reconciliations have both slicer_new and category_new
+                fully_reconciled = all(
+                    r.slicer_new and r.slicer_new.strip() and 
+                    r.category_new and r.category_new.strip() 
+                    for r in reconciliations
+                )
+                if fully_reconciled:
+                    reconciled_count += 1
+                else:
+                    pending_count += 1
+            else:
+                pending_count += 1
+        
+        context.update({
+            'total_uploads': total_uploads,
+            'reconciled_count': reconciled_count,
+            'pending_count': pending_count,
+        })
+        
+        return context
 
 
 

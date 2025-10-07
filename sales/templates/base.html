@@ -571,9 +571,9 @@
         /* Notifications */
         .notification {
             position: fixed;
-            top: 20px;
+            top: 80px;
             right: 20px;
-            z-index: 9999;
+            z-index: 10000;
             min-width: 300px;
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
@@ -756,10 +756,10 @@
             });
         });
 
-        // Notification system
+        // Enhanced Notification system
         function showNotification(message, type = 'info') {
             const notification = $(`
-                <div class="notification alert alert-${type} alert-dismissible fade show" role="alert">
+                <div class="notification alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show" role="alert" style="position: fixed; top: 80px; right: 20px; z-index: 10000; min-width: 300px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);">
                     <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
                     ${message}
                     <button type="button" class="btn-close" data-bs-dismiss="alert"></button>

@@ -110,23 +110,37 @@
             color: white;
         }
         
-        /* Hero Section */
+        /* Enhanced Hero Section */
         .hero-section {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 150px 0 100px;
             position: relative;
             overflow: hidden;
+            color: white;
         }
         
         .hero-section::before {
             content: '';
             position: absolute;
             top: 0;
-            left: 0;
             right: 0;
+            width: 300px;
+            height: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(50%, -50%);
+        }
+        
+        .hero-section::after {
+            content: '';
+            position: absolute;
             bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23667eea" opacity="0.1"><polygon points="1000,100 1000,0 0,100"/></svg>') no-repeat;
-            background-size: cover;
+            left: 0;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            transform: translate(-50%, 50%);
         }
         
         .hero-content {
@@ -138,30 +152,41 @@
             font-size: 3.5rem;
             font-weight: 800;
             margin-bottom: 20px;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: white;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
         
         .hero-subtitle {
             font-size: 1.3rem;
-            color: var(--text-light);
+            color: rgba(255, 255, 255, 0.9);
             margin-bottom: 40px;
             font-weight: 400;
         }
         
         .hero-description {
             font-size: 1.1rem;
-            color: var(--text-dark);
+            color: rgba(255, 255, 255, 0.85);
             margin-bottom: 40px;
             line-height: 1.8;
         }
         
-        /* Service Cards */
+        /* Enhanced Service Cards Section */
         .services-section {
             padding: 100px 0;
-            background: var(--bg-light);
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            position: relative;
+        }
+        
+        .services-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.05) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
         }
         
         .section-title {
@@ -179,20 +204,21 @@
             margin-bottom: 60px;
         }
         
+        /* Modern Service Cards - Dashboard Style */
         .service-card {
-            background: white;
             border-radius: 20px;
-            padding: 40px 30px;
+            padding: 35px 25px;
             text-align: center;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
             margin-bottom: 30px;
             position: relative;
             overflow: hidden;
-            height: 400px;
+            height: 380px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            color: white;
         }
         
         .service-card::before {
@@ -201,67 +227,82 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 4px;
-            background: var(--primary-gradient);
+            bottom: 0;
+            opacity: 0.1;
+            background-size: 60px 60px;
+            background-repeat: no-repeat;
+            background-position: top right;
         }
         
         .service-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
         }
         
-        .service-card.accounting::before { background: var(--success-gradient); }
-        .service-card.tax::before { background: var(--primary-gradient); }
-        .service-card.payroll::before { background: var(--warning-gradient); }
-        .service-card.consulting::before { background: var(--secondary-gradient); }
-        .service-card.franchise::before { background: var(--primary-gradient); }
+        .service-card.accounting { 
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+        }
+        .service-card.tax { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .service-card.payroll { 
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .service-card.consulting { 
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .service-card.franchise { 
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
         
         .service-icon {
-            font-size: 3rem;
+            font-size: 2.5rem;
             margin-bottom: 20px;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: rgba(255, 255, 255, 0.9);
+            position: relative;
+            z-index: 2;
         }
         
-        .service-card.accounting .service-icon { background: var(--success-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .service-card.tax .service-icon { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .service-card.payroll .service-icon { background: var(--warning-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .service-card.consulting .service-icon { background: var(--secondary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .service-card.franchise .service-icon { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        
         .service-title {
-            font-size: 1.5rem;
-            font-weight: 700;
+            font-size: 1.4rem;
+            font-weight: 800;
             margin-bottom: 15px;
-            color: var(--text-dark);
+            color: white;
+            position: relative;
+            z-index: 2;
         }
         
         .service-description {
-            color: var(--text-light);
-            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.9rem;
             line-height: 1.6;
             margin-bottom: 25px;
             flex-grow: 1;
+            position: relative;
+            z-index: 2;
         }
         
         .service-btn {
-            background: transparent;
-            border: 2px solid #667eea;
-            color: #667eea;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
             padding: 10px 20px;
             border-radius: 25px;
-            font-weight: 600;
+            font-weight: 700;
             transition: all 0.3s ease;
             text-decoration: none;
             display: inline-block;
+            backdrop-filter: blur(10px);
+            position: relative;
+            z-index: 2;
         }
         
         .service-btn:hover {
-            background: var(--primary-gradient);
+            background: rgba(255, 255, 255, 0.3);
             color: white;
-            border-color: transparent;
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
         
         /* CTA Section */
