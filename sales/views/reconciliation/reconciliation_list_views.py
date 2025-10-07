@@ -1,5 +1,7 @@
 import random
 from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 # from sales.models import CatListC, CatListD, SalesData, Reconciliation, SlicerList
 from sales.models import CategoryMapping, SalesData, Reconciliation
 import re
@@ -71,27 +73,34 @@ def reconciliation_list(request, sales_data_id):
     for reconciliation in reconciliations:
         matched_mapping = None
 
-        # Match description with slicer_list using regex
-        for mapping in category_mappings:
-            pattern = r'\b' + re.escape(mapping.slicer_list.strip()) + r'\b'
-            if re.search(pattern, reconciliation.description, re.IGNORECASE):
-                matched_mapping = mapping
-                break
+        # Only auto-assign if fields are empty
+        if not reconciliation.slicer_new or not reconciliation.category_new:
+            # Match description with slicer_list using regex
+            for mapping in category_mappings:
+                pattern = r'\b' + re.escape(mapping.slicer_list.strip()) + r'\b'
+                if re.search(pattern, reconciliation.description, re.IGNORECASE):
+                    matched_mapping = mapping
+                    break
 
-        # Assign matched slicer/category names (if found)
-        reconciliation.slicer_new = matched_mapping.slicer_list if matched_mapping else " "
-        reconciliation.slicer_list_name = matched_mapping.slicer_list if matched_mapping else "No slicer list available"
-        reconciliation.cat_list_d_name = matched_mapping.cat_list_d if matched_mapping else "No category list D available"
-        reconciliation.cat_list_c_name = matched_mapping.cat_list_c if matched_mapping else "No category list C available"
+            # Assign matched slicer/category names (if found) and save to database
+            if matched_mapping:
+                if not reconciliation.slicer_new:
+                    reconciliation.slicer_new = matched_mapping.slicer_list
+                    
+                if not reconciliation.category_new:
+                    # Assign category_new based on debit/credit
+                    if reconciliation.amount < 0:
+                        reconciliation.category_new = matched_mapping.cat_list_d
+                    else:
+                        reconciliation.category_new = matched_mapping.cat_list_c
+                
+                # Save the changes to database
+                reconciliation.save()
 
-        # Assign category_new based on debit/credit
-        if matched_mapping:
-            if reconciliation.amount < 0:
-                reconciliation.category_new = matched_mapping.cat_list_d
-            else:
-                reconciliation.category_new = matched_mapping.cat_list_c
-        else:
-            reconciliation.category_new = " "
+        # Set display attributes for template (these are not saved to DB)
+        reconciliation.slicer_list_name = reconciliation.slicer_new if reconciliation.slicer_new else "No slicer list available"
+        reconciliation.cat_list_d_name = reconciliation.category_new if reconciliation.category_new else "No category list D available"
+        reconciliation.cat_list_c_name = reconciliation.category_new if reconciliation.category_new else "No category list C available"
 
     # Generate pivot summary for reconciled and unreconciled transactions
     pivot_summary = {
@@ -101,7 +110,7 @@ def reconciliation_list(request, sales_data_id):
 
     for reconciliation in reconciliations:
         # Determine if this entry is reconciled (has both slicer and category)
-        is_reconciled = reconciliation.slicer_new.strip() and reconciliation.category_new.strip()
+        is_reconciled = reconciliation.slicer_new and reconciliation.slicer_new.strip() and reconciliation.category_new and reconciliation.category_new.strip()
 
         if reconciliation.amount < 0:
             # Debit
@@ -123,3 +132,43 @@ def reconciliation_list(request, sales_data_id):
         'category_mappings': category_mappings,
         'pivot_summary': pivot_summary,
     })
+
+
+@csrf_exempt
+def update_reconciliation_field(request, reconciliation_id):
+    """Update slicer_new or category_new field for a reconciliation record"""
+    if request.method == "POST":
+        try:
+            reconciliation = get_object_or_404(Reconciliation, id=reconciliation_id)
+            
+            # Get the field name and value from the request
+            field_name = request.POST.get('field_name')
+            field_value = request.POST.get('field_value', '').strip()
+            
+            # Debug logging
+            print(f"Updating reconciliation {reconciliation_id}: {field_name} = '{field_value}'")
+            
+            # Validate field name
+            if field_name not in ['slicer_new', 'category_new']:
+                return JsonResponse({"success": False, "error": "Invalid field name"})
+            
+            # Update the field
+            setattr(reconciliation, field_name, field_value)
+            reconciliation.save()
+            
+            # Verify the save worked
+            reconciliation.refresh_from_db()
+            saved_value = getattr(reconciliation, field_name)
+            print(f"Saved value: '{saved_value}'")
+            
+            return JsonResponse({
+                "success": True, 
+                "message": f"{field_name} updated successfully",
+                "new_value": saved_value
+            })
+            
+        except Exception as e:
+            print(f"Error updating reconciliation field: {str(e)}")
+            return JsonResponse({"success": False, "error": str(e)})
+    
+    return JsonResponse({"success": False, "error": "Invalid request method"})

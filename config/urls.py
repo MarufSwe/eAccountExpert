@@ -16,12 +16,15 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import redirect
+
+def redirect_to_dashboard(request):
+    return redirect('sales_data_list')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', redirect_to_dashboard, name='landing-page'),
     path('', include('sales.urls')),
-    path('', include('landingpage.urls')),
-
 ]
 from django.conf import settings
 from django.conf.urls.static import static

@@ -1,207 +1,466 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Sales Data Dashboard{% endblock %}
 
 {% block content %}
 
 <style>
-    .scrollable-box {
-        max-height: 300px;
-        overflow-y: auto;
+    .page-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
     }
 
-    /*Upload New File Button*/
-    @keyframes shimmer {
-        0% { background-position: -200px 0; }
-        100% { background-position: 200px 0; }
-    }
-    
-    .shimmer-btn {
-        background: linear-gradient(90deg,rgb(183, 212, 241) 25%,rgb(255, 255, 255) 50%,rgb(167, 202, 241) 75%);
-        background-size: 200% 100%;
-        animation: shimmer 1.5s infinite linear;
+    .page-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 10px;
     }
 
-    .btn-secondary:disabled {
-        background-color: #6c757d !important; /* Dark gray */
-        color: white !important; /* White text */
-        opacity: 1 !important; /* Ensure full visibility */
+    .page-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .upload-btn {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        border-radius: 12px;
+        padding: 15px 30px;
+        font-weight: 600;
+        color: white;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    }
+
+    .upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .sales-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        margin-bottom: 25px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 1px solid #f1f3f4;
+    }
+
+    .sales-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-bottom: 1px solid #dee2e6;
+        padding: 20px 25px;
+        display: flex;
+        justify-content: between;
+        align-items: center;
+    }
+
+    .shop-info h5 {
+        font-weight: 700;
+        color: #2c3e50;
+        margin: 0;
+        font-size: 1.3rem;
+    }
+
+    .upload-date {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin: 5px 0 0 0;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .btn-reconcile {
+        background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(255, 193, 7, 0.3);
+    }
+
+    .btn-reconcile:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(255, 193, 7, 0.4);
+        color: white;
+    }
+
+    .btn-reconcile:disabled {
+        background: #6c757d;
+        box-shadow: none;
+        transform: none;
         cursor: not-allowed;
     }
-    
+
+    .btn-view {
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 600;
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 3px 10px rgba(0, 123, 255, 0.3);
+    }
+
+    .btn-view:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(0, 123, 255, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .data-table {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .data-table thead th {
+        background: #f8f9fa;
+        border: none;
+        font-weight: 600;
+        color: #495057;
+        padding: 12px 15px;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .data-table tbody td {
+        padding: 12px 15px;
+        border-top: 1px solid #f1f3f4;
+        vertical-align: middle;
+    }
+
+    .data-table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .scrollable-container {
+        max-height: 400px;
+        overflow-y: auto;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6c757d;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+
+    .empty-state h4 {
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-reconciled {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .stats-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        margin-bottom: 25px;
+        border-left: 4px solid;
+    }
+
+    .stats-card.primary {
+        border-left-color: #007bff;
+    }
+
+    .stats-card.success {
+        border-left-color: #28a745;
+    }
+
+    .stats-card.warning {
+        border-left-color: #ffc107;
+    }
+
+    .stats-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .stats-label {
+        color: #6c757d;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        font-size: 0.9rem;
+    }
+
+    @media (max-width: 768px) {
+        .action-buttons {
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .data-table {
+            font-size: 0.8rem;
+        }
+
+        .data-table thead th,
+        .data-table tbody td {
+            padding: 8px 10px;
+        }
+    }
 </style>
 
-<body>
-    <div class="sticky-header d-flex justify-content-between align-items-center">
-        <h4 class="mb-0">📊 Sales Data</h4>
-        {% comment %} <a href="{% url 'upload_sales_data' %}" class="btn btn-light">📤 Upload New File</a> {% endcomment %}
-        <a href="{% url 'upload_sales_data' %}" class="btn btn-light shimmer-btn">📤 Upload New File</a>
-
+<!-- Page Header -->
+<div class="page-header">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="page-title">
+                <i class="fas fa-chart-bar me-3"></i>Sales Data Dashboard
+            </h1>
+            <p class="page-subtitle">Manage and reconcile your financial transactions</p>
+        </div>
+        <div class="col-md-4 text-md-end">
+            <a href="{% url 'upload_sales_data' %}" class="upload-btn">
+                <i class="fas fa-upload me-2"></i>Upload New File
+            </a>
+        </div>
     </div>
-    
-    <div class="content">
-        {% for sales in sales_data %}
-            <div class="card mb-2 mt-2 shadow-sm">
+</div>
 
-                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #343a40; color: white;">
-                    <h5 class="mb-0">{{ sales.shop.name }} (📅 {{ sales.date_uploaded }})</h5>
-                    
-                    <div>
-                        <!-- Reconcile Button (Disabled if already reconciled) -->
-                        {% if sales.is_reconciled %}
-                            <button class="btn btn-secondary" disabled>✅ Reconciled</button>
-                        {% else %}
-                            <button class="btn btn-warning reconcile-btn" data-record-id="{{ sales.id }}" onclick="reconcileSales({{ sales.id }})">
-                                🔄 Reconcile
-                            </button>
-                        {% endif %}
-                        
-                        <!-- View Reconciliation List Button -->
-                        <a href="{% url 'reconciliation_list' sales.id %}" class="btn btn-primary ml-2">
-                            📋 View Reconciliation List
-                        </a>
-                    </div>
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="stats-card primary">
+            <div class="stats-number text-primary">{{ sales_data|length }}</div>
+            <div class="stats-label">Total Uploads</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card success">
+            <div class="stats-number text-success">
+                {{ sales_data|length|add:"-1"|default:"0" }}
+            </div>
+            <div class="stats-label">Reconciled</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="stats-card warning">
+            <div class="stats-number text-warning">1</div>
+            <div class="stats-label">Pending</div>
+        </div>
+    </div>
+</div>
+
+<!-- Sales Data Cards -->
+{% if sales_data %}
+    {% for sales in sales_data %}
+        <div class="sales-card">
+            <div class="card-header">
+                <div class="shop-info">
+                    <h5>
+                        <i class="fas fa-store me-2"></i>{{ sales.shop.name }}
+                    </h5>
+                    <p class="upload-date">
+                        <i class="fas fa-calendar me-1"></i>
+                        Uploaded on {{ sales.date_uploaded|date:"F d, Y \a\t g:i A" }}
+                    </p>
                 </div>
-                
-                <div class="card-body">
-                    {% if sales.data %}
-                        <div class="scrollable-box">
-                            <table class="table table-sm table-bordered table-striped">
-                                <thead class="thead-light">
-                                    <tr>
-                                        {% for key in sales.data.0.keys %}
-                                            <th>{{ key|capfirst }}</th>
-                                        {% endfor %}
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for record in sales.data %}
-                                        <tr>
-                                            {% for value in record.values %}
-                                                <td>{{ value }}</td>
-                                            {% endfor %}
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+                <div class="action-buttons">
+                    {% if sales.is_reconciled %}
+                        <span class="status-badge status-reconciled">
+                            <i class="fas fa-check-circle me-1"></i>Reconciled
+                        </span>
                     {% else %}
-                        <p class="text-muted">No data available.</p>
+                        <button class="btn-reconcile" data-record-id="{{ sales.id }}" onclick="reconcileSales({{ sales.id }})">
+                            <i class="fas fa-sync-alt me-1"></i>Reconcile
+                        </button>
                     {% endif %}
+                    
+                    <a href="{% url 'reconciliation_list' sales.id %}" class="btn-view">
+                        <i class="fas fa-list me-1"></i>View Details
+                    </a>
                 </div>
             </div>
-        {% empty %}
-            <p class="alert alert-warning text-center mt-4">No data available.</p>
-        {% endfor %}
+            
+            <div class="card-body">
+                {% if sales.data %}
+                    <div class="scrollable-container">
+                        <table class="professional-table data-table">
+                            <thead>
+                                <tr>
+                                    {% for key in sales.data.0.keys %}
+                                        <th>{{ key|capfirst }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in sales.data %}
+                                    <tr>
+                                        {% for value in record.values %}
+                                            <td>{{ value }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <h4>No Data Available</h4>
+                        <p>This upload doesn't contain any data.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-state">
+        <i class="fas fa-chart-line"></i>
+        <h4>No Sales Data Found</h4>
+        <p>Upload your first bank statement to get started with reconciliation.</p>
+        <a href="{% url 'upload_sales_data' %}" class="upload-btn mt-3">
+            <i class="fas fa-upload me-2"></i>Upload Your First File
+        </a>
     </div>
-</body>
+{% endif %}
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            document.querySelectorAll(".reconcile-btn").forEach(button => {
-                button.addEventListener("click", function() {
-                    const recordId = this.getAttribute("data-record-id");
-                    fetch(`/reconcile/${recordId}/`, {
-                        method: "POST",
-                        headers: {
-                            "X-CSRFToken": "{{ csrf_token }}",
-                            "Content-Type": "application/json"
-                        },
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert("✅ Reconciliation successful!");
-                        } else {
-                            alert("❌ Error: " + data.error);
-                        }
-                    })
-                    .catch(error => console.error("Error:", error));
-                });
-            });
-        });
-    </script>
-        
-    <script>
-        function reconcileSales(salesId) {
-            // Send the reconcile request via AJAX
-            fetch(`/reconcile/${salesId}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}',
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Disable the reconcile button and change the button text to "✔ Reconciled"
-                    const button = document.querySelector(`button[data-record-id='${salesId}']`);
-                    if (button) {
-                        button.disabled = true;
-                        button.innerText = '✔ Reconciled';
-                    }
-                    // Optionally reload the page to reflect changes immediately
-                    location.reload();
-                } else {
-                    alert(data.error || 'Reconciliation failed. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Something went wrong. Please try again later.');
-            });
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-hide success messages
+    setTimeout(function() {
+        $('.alert-success').fadeOut();
+    }, 5000);
+});
+
+function reconcileSales(salesId) {
+    const button = document.querySelector(`button[data-record-id='${salesId}']`);
+    const originalContent = button.innerHTML;
+    
+    // Show loading state
+    button.disabled = true;
+    button.innerHTML = '<span class="loading-spinner me-2"></span>Processing...';
+    
+    // Send reconciliation request
+    fetch(`/reconcile/${salesId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update button to reconciled state
+            button.innerHTML = '<i class="fas fa-check-circle me-1"></i>Reconciled';
+            button.className = 'btn-reconcile';
+            button.disabled = true;
+            
+            // Show success notification
+            showNotification('Reconciliation completed successfully!', 'success');
+            
+            // Optionally reload the page
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            // Reset button on error
+            button.disabled = false;
+            button.innerHTML = originalContent;
+            showNotification('Error: ' + (data.error || 'Reconciliation failed'), 'error');
         }
-    </script>
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        button.disabled = false;
+        button.innerHTML = originalContent;
+        showNotification('Network error occurred. Please try again.', 'error');
+    });
+}
 
-    <script>
-        function reconcileSales(salesId) {
-            // Find the button and replace it with the loading spinner
-            const button = document.querySelector(`button[data-record-id='${salesId}']`);
-            if (button) {
-                // Show the loader (🔄) while reconciliation is happening
-                button.disabled = true;  // Disable the button to prevent multiple clicks
-                button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
             }
-    
-            // Send the reconcile request via AJAX
-            fetch(`/reconcile/${salesId}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}',
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Change button to "✔ Reconciled" once reconciliation is done
-                    if (button) {
-                        button.innerHTML = '✔ Reconciled';
-                        button.disabled = true;
-                    }
-                    // Optionally reload the page to reflect changes immediately
-                    location.reload();
-                } else {
-                    alert(data.error || 'Reconciliation failed. Please try again.');
-                    // Reset the button to its original state if failed
-                    if (button) {
-                        button.innerHTML = '🔄 Reconcile';
-                        button.disabled = false;
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Something went wrong. Please try again later.');
-                // Reset the button to its original state if there was an error
-                if (button) {
-                    button.innerHTML = '🔄 Reconcile';
-                    button.disabled = false;
-                }
-            });
         }
-    </script>
-    
+    }
+    return cookieValue;
+}
+</script>
+
 {% endblock %}

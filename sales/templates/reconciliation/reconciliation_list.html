@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 {% load static %}
 
@@ -7,157 +6,553 @@
 {% block content %}
 
 <style>
-    /* Make the table header sticky */
-    .table thead th {
-        position: sticky;
-        top: 0;
-        background-color: #f8f9fa; /* Light gray background */
-        font-weight: bold;
-        font-size: 16px;
-        z-index: 2;
-    }
-
-    /* Add a container to control the table height */
-    .table-container {
-        max-height: 100%; /* Adjust this height as needed */
-        overflow-y: auto; /* Enable vertical scrolling */
-        border: 1px solid #ddd; /* Optional: Add a border */
-    }
-
-    /* Table body styling */
-    .table tbody td {
-        font-size: 13px; /* Adjust text size for better readability */
-        padding: 5px; /* Add padding for spacing */
-    }
-
-    /* Truncate long text in description */
-    .truncate-text {
-        max-width: 400px; 
-        white-space: nowrap;
+    /* Professional Table Styling */
+    .reconciliation-table {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         overflow: hidden;
-        text-overflow: ellipsis;
+    }
+    
+    .table-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 12px 12px 0 0;
+    }
+    
+    .table thead th {
+        background: #f8f9fa;
+        border: none;
+        font-weight: 600;
+        color: #495057;
+        padding: 15px 12px;
+        font-size: 14px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .table tbody td {
+        padding: 12px;
+        vertical-align: middle;
+        border-top: 1px solid #e9ecef;
+        font-size: 13px;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+        transition: all 0.2s ease;
+    }
+    
+    /* Inline Edit Styling */
+    .editable-field {
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+        min-height: 24px;
+        display: inline-block;
+        min-width: 100px;
+    }
+    
+    .editable-field:hover {
+        background-color: #e3f2fd;
+        border: 1px dashed #2196f3;
+    }
+    
+    .editable-field.empty {
+        color: #6c757d;
+        font-style: italic;
+        background-color: #f8f9fa;
+    }
+    
+    .editable-field.empty:hover {
+        background-color: #e9ecef;
+        border: 1px dashed #6c757d;
+    }
+    
+    .edit-input {
+        width: 100%;
+        padding: 4px 8px;
+        border: 2px solid #2196f3;
+        border-radius: 4px;
+        font-size: 13px;
+        outline: none;
+    }
+    
+    .edit-buttons {
+        display: inline-block;
+        margin-left: 5px;
+    }
+    
+    .btn-save, .btn-cancel {
+        padding: 2px 8px;
+        font-size: 11px;
+        border: none;
+        border-radius: 3px;
+        cursor: pointer;
+        margin: 0 2px;
+    }
+    
+    .btn-save {
+        background: #28a745;
+        color: white;
+    }
+    
+    .btn-cancel {
+        background: #dc3545;
+        color: white;
+    }
+    
+    /* Summary Cards */
+    .summary-card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease;
+    }
+    
+    .summary-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .summary-card.reconciled {
+        border-left: 4px solid #28a745;
+    }
+    
+    .summary-card.unreconciled {
+        border-left: 4px solid #dc3545;
+    }
+    
+    .summary-card .card-header {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border: none;
+        font-weight: 600;
+    }
+    
+    .summary-card.unreconciled .card-header {
+        background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+    }
+    
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-success {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        border-radius: 8px;
+        padding: 10px 20px;
+        font-weight: 500;
+    }
+    
+    /* Loading States */
+    .loading {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+    
+    .spinner {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #3498db;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .table-responsive {
+            font-size: 12px;
+        }
+        
+        .editable-field {
+            min-width: 80px;
+        }
     }
 </style>
 
-
-<div class="sticky-header d-flex justify-content-between align-items-center mb-3 p-3 bg-light border rounded shadow-sm">
-    <h4 class="mb-0 text-primary fw-bold" style="font-size: 1.4rem;">
-        <i class="fas fa-chart-bar me-2"></i>
-        Reconciliation List for <span class="text-dark">{{ sales_data.shop.name }}</span> 
-        <small class="text-muted">(📅 {{ sales_data.date_uploaded }})</small>
-    </h4>
-    <a href="{% url 'sales_data_list' %}" class="btn btn-outline-primary btn-sm shadow-sm">
-        <i class="fas fa-clipboard-list me-1"></i> Back to Sales Data
-    </a>
-</div>
-
-
-<!-- Pivot Summary Section -->
-{% if pivot_summary %}
-<div class="row mb-3">
-    <!-- Reconciled Summary Card -->
-    <div class="col-md-6">
-        <div class="card border-success" style="font-size: 0.875rem;">
-            <div class="card-header bg-success text-white font-weight-bold py-2 px-3">
-                <i class="fas fa-check-circle mr-2"></i> Reconciled Summary
-            </div>
-                <div class="card-body py-2 px-3">
-                <table class="table table-sm mb-0">
-                    <tbody>
-                        <tr>
-                            <th scope="row">Total Debit (Dr)</th>
-                            <td class="text-right text-success font-weight-bold">
-                                {{ pivot_summary.reconciled.dr }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Total Credit (Cr)</th>
-                            <td class="text-right text-success font-weight-bold">
-                                {{ pivot_summary.reconciled.cr }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+<div class="container-fluid">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="table-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-1">
+                            <i class="fas fa-chart-line me-2"></i>
+                            Reconciliation Report
+                        </h4>
+                        <p class="mb-0 opacity-75">
+                            <strong>{{ sales_data.shop.name }}</strong> • 
+                            <i class="fas fa-calendar me-1"></i>{{ sales_data.date_uploaded|date:"M d, Y" }}
+                        </p>
+                    </div>
+                    <div class="action-buttons">
+                        <a href="{% url 'sales_data_list' %}" class="btn btn-light">
+                            <i class="fas fa-arrow-left me-1"></i> Back to Sales Data
+                        </a>
+                        <button class="btn btn-success" onclick="generatePLReport()">
+                            <i class="fas fa-file-invoice me-1"></i> Generate P&L Report
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Unreconciled Summary Card -->
-    <div class="col-md-6">
-        <div class="card border-danger" style="font-size: 0.875rem;">
-            <div class="card-header bg-danger text-white font-weight-bold py-2 px-3">
-                <i class="fas fa-exclamation-triangle mr-2"></i> Unreconciled Summary
+    <!-- Summary Cards -->
+    {% if pivot_summary %}
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card summary-card reconciled">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-check-circle me-2"></i>Reconciled Transactions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h5 class="text-success mb-1">${{ pivot_summary.reconciled.dr|floatformat:2 }}</h5>
+                                <small class="text-muted">Total Debit (Dr)</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="text-success mb-1">${{ pivot_summary.reconciled.cr|floatformat:2 }}</h5>
+                            <small class="text-muted">Total Credit (Cr)</small>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="card-body py-2 px-3">
-                <table class="table table-sm mb-0">
-                    <tbody>
-                        <tr>
-                            <th scope="row">Total Debit (Dr)</th>
-                            <td class="text-right text-danger font-weight-bold">
-                                {{ pivot_summary.unreconciled.dr }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th scope="row">Total Credit (Cr)</th>
-                            <td class="text-right text-danger font-weight-bold">
-                                {{ pivot_summary.unreconciled.cr }}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card summary-card unreconciled">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Unreconciled Transactions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="border-end">
+                                <h5 class="text-danger mb-1">${{ pivot_summary.unreconciled.dr|floatformat:2 }}</h5>
+                                <small class="text-muted">Total Debit (Dr)</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <h5 class="text-danger mb-1">${{ pivot_summary.unreconciled.cr|floatformat:2 }}</h5>
+                            <small class="text-muted">Total Credit (Cr)</small>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
-{% endif %}
-
-<!-- Reconciliation Table -->
-<div class="table-responsive mb-3">
-    {% if reconciliations %}
-        <table class="table table-sm table-bordered table-hover" style="font-size: 0.875rem;">
-            <thead class="thead-dark">
-                <tr class="text-center">
-                    <th><i class="fas fa-align-left"></i> Description</th>
-                    <th><i class="fas fa-coins"></i> Amount</th>
-                    <th><i class="fas fa-filter"></i> Slicer New</th>
-                    <th><i class="fas fa-tags"></i> Category New</th>
-                    <th><i class="fas fa-arrow-down text-success"></i> Credit (Cr)</th>
-                    <th><i class="fas fa-arrow-up text-danger"></i> Debit (Dr)</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for reconciliation in reconciliations %}
-                    <tr>
-                        {% comment %} <td title="{{ reconciliation.description }}">
-                            {{ reconciliation.description|slice:":80" }}{% if reconciliation.description|length > 80 %}...{% endif %}
-                        </td> {% endcomment %}
-                        
-                        <td class="text-truncate" style="max-width: 500px;" title="{{ reconciliation.description }}">
-                            {{ reconciliation.description }}
-                        </td>
-                        <td>{{ reconciliation.amount }}</td>
-                        <td>
-                            {% if reconciliation.slicer_new.strip %}{{ reconciliation.slicer_new }}{% else %}<span class="text-muted">N/A</span>{% endif %}
-                        </td>
-                        <td>
-                            {% if reconciliation.category_new.strip %}{{ reconciliation.category_new }}{% else %}<span class="text-muted">N/A</span>{% endif %}
-                        </td>
-                        <td class="text-success text-right">{{ reconciliation.credit_amount }}</td>
-                        <td class="text-danger text-right">
-                            {% if reconciliation.debit_amount > 0 %}
-                                -{{ reconciliation.debit_amount }}
-                            {% else %}
-                                {{ reconciliation.debit_amount }}
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    {% else %}
-        <div class="alert alert-warning text-center">No reconciliations available.</div>
     {% endif %}
+
+    <!-- Reconciliation Table -->
+    <div class="card reconciliation-table">
+        <div class="card-body p-0">
+            {% if reconciliations %}
+                <div class="table-responsive">
+                    <table class="professional-table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th width="5%">#</th>
+                                <th width="35%">
+                                    <i class="fas fa-align-left me-1"></i>Description
+                                </th>
+                                <th width="10%" class="text-center">
+                                    <i class="fas fa-coins me-1"></i>Amount
+                                </th>
+                                <th width="20%">
+                                    <i class="fas fa-filter me-1"></i>Slicer New
+                                    <!-- <small class="text-muted d-block">Click to edit</small> -->
+                                </th>
+                                <th width="20%">
+                                    <i class="fas fa-tags me-1"></i>Category New
+                                    <!-- <small class="text-muted d-block">Click to edit</small> -->
+                                </th>
+                                <th width="10%" class="text-center">
+                                    <i class="fas fa-arrow-down text-success me-1"></i>Credit
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for reconciliation in reconciliations %}
+                                <tr>
+                                    <td class="text-muted">{{ forloop.counter }}</td>
+                                    <td>
+                                        <div class="text-truncate" style="max-width: 300px;" title="{{ reconciliation.description }}">
+                                            {{ reconciliation.description }}
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge {% if reconciliation.amount < 0 %}bg-danger{% else %}bg-success{% endif %}">
+                                            ${{ reconciliation.amount|floatformat:2 }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="editable-field {% if not reconciliation.slicer_new.strip %}empty{% endif %}" 
+                                             data-field="slicer_new" 
+                                             data-id="{{ reconciliation.id }}"
+                                             data-value="{{ reconciliation.slicer_new|default:'' }}">
+                                            {% if reconciliation.slicer_new.strip %}
+                                                {{ reconciliation.slicer_new }}
+                                            {% else %}
+                                                Click to add slicer
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="editable-field {% if not reconciliation.category_new.strip %}empty{% endif %}" 
+                                             data-field="category_new" 
+                                             data-id="{{ reconciliation.id }}"
+                                             data-value="{{ reconciliation.category_new|default:'' }}">
+                                            {% if reconciliation.category_new.strip %}
+                                                {{ reconciliation.category_new }}
+                                            {% else %}
+                                                Click to add category
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="d-flex justify-content-center">
+                                            <span class="text-success fw-bold">${{ reconciliation.credit_amount|floatformat:2 }}</span>
+                                        </div>
+                                        <div class="text-danger fw-bold">${{ reconciliation.debit_amount|floatformat:2 }}</div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No reconciliations available</h5>
+                    <p class="text-muted">Upload and reconcile some sales data first.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Use event delegation for better reliability
+    document.addEventListener('click', function(e) {
+        // Handle editable field clicks
+        if (e.target.closest('.editable-field') && !e.target.closest('.edit-input') && !e.target.closest('.edit-buttons')) {
+            const field = e.target.closest('.editable-field');
+            if (!field.querySelector('.edit-input')) {
+                makeEditable(field);
+            }
+        }
+        
+        // Handle save button clicks
+        if (e.target.closest('.btn-save')) {
+            const button = e.target.closest('.btn-save');
+            const field = button.closest('.editable-field');
+            const input = field.querySelector('.edit-input');
+            const fieldId = field.dataset.id;
+            const fieldName = field.dataset.field;
+            saveField(fieldId, fieldName, input.value, field);
+        }
+        
+        // Handle cancel button clicks
+        if (e.target.closest('.btn-cancel')) {
+            const button = e.target.closest('.btn-cancel');
+            const field = button.closest('.editable-field');
+            const originalValue = field.dataset.value || '';
+            cancelEdit(field, originalValue);
+        }
+    });
+});
+
+function makeEditable(field) {
+    if (field.querySelector('.edit-input')) return; // Already in edit mode
+    
+    const currentValue = field.dataset.value || '';
+    const fieldName = field.dataset.field;
+    const fieldId = field.dataset.id;
+    
+    // Create input field
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'edit-input';
+    input.value = currentValue;
+    
+    // Create buttons
+    const buttonContainer = document.createElement('div');
+    buttonContainer.className = 'edit-buttons';
+    
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'btn-save';
+    saveBtn.innerHTML = '<i class="fas fa-check"></i>';
+    saveBtn.type = 'button';
+    
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'btn-cancel';
+    cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
+    cancelBtn.type = 'button';
+    
+    buttonContainer.appendChild(saveBtn);
+    buttonContainer.appendChild(cancelBtn);
+    
+    // Replace content
+    field.innerHTML = '';
+    field.appendChild(input);
+    field.appendChild(buttonContainer);
+    
+    // Focus and select the input
+    input.focus();
+    input.select();
+    
+    // Handle Enter key for save
+    input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            saveField(fieldId, fieldName, input.value, field);
+        }
+    });
+    
+    // Handle Escape key for cancel
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            cancelEdit(field, currentValue);
+        }
+    });
+}
+
+function saveField(reconciliationId, fieldName, value, fieldElement) {
+    fieldElement.classList.add('loading');
+    
+    fetch(`/reconciliation/${reconciliationId}/update/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: `field_name=${fieldName}&field_value=${encodeURIComponent(value)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        fieldElement.classList.remove('loading');
+        
+        if (data.success) {
+            // Update the field display
+            fieldElement.dataset.value = value;
+            fieldElement.innerHTML = value || 'Click to add ' + fieldName.replace('_', ' ');
+            fieldElement.classList.toggle('empty', !value.trim());
+            
+            // Show success message
+            showNotification('Field updated successfully!', 'success');
+        } else {
+            showNotification('Error: ' + data.error, 'error');
+            // Revert to original value
+            const originalValue = fieldElement.dataset.value || '';
+            fieldElement.innerHTML = originalValue || 'Click to add ' + fieldName.replace('_', ' ');
+            fieldElement.classList.toggle('empty', !originalValue.trim());
+        }
+    })
+    .catch(error => {
+        fieldElement.classList.remove('loading');
+        showNotification('Network error occurred', 'error');
+        console.error('Error:', error);
+        
+        // Revert to original value
+        const originalValue = fieldElement.dataset.value || '';
+        fieldElement.innerHTML = originalValue || 'Click to add ' + fieldName.replace('_', ' ');
+        fieldElement.classList.toggle('empty', !originalValue.trim());
+    });
+}
+
+function cancelEdit(field, originalValue) {
+    // Simply restore the original content
+    field.innerHTML = originalValue || 'Click to add ' + field.dataset.field.replace('_', ' ');
+    field.classList.toggle('empty', !originalValue.trim());
+    // No need to re-add event listeners since we're using event delegation
+}
+
+function generatePLReport() {
+    // Check if there are unreconciled transactions
+    const unreconciledCount = document.querySelectorAll('.editable-field.empty').length;
+    
+    if (unreconciledCount > 0) {
+        if (!confirm(`You have ${unreconciledCount} unreconciled transactions. Do you want to generate P&L report anyway?`)) {
+            return;
+        }
+    }
+    
+    // Redirect to P&L report
+    window.location.href = "{% url 'pl_report' sales_data.id %}";
+}
+
+function showNotification(message, type) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} alert-dismissible fade show position-fixed`;
+    notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 3000);
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
 
 {% endblock %}

@@ -1,36 +1,491 @@
-
 {% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Upload Sales Data{% endblock %}
+
 {% block content %}
 
-<div class="container mt-5">
-    {% comment %} <h1>Upload Sales Data</h1> {% endcomment %}
+<style>
+    .upload-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Upload Sales File</h2>
-        <a href="{% url 'shop_create' %}" class="btn btn-success">➕ Create New Shop</a>
+    .upload-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .upload-title {
+        font-size: 2.2rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .upload-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin: 0;
+    }
+
+    .upload-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        padding: 40px;
+        border: 1px solid #f1f3f4;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 8px;
+        font-size: 1rem;
+    }
+
+    .form-control {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 12px 15px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+    }
+
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        background: white;
+    }
+
+    .form-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m1 6 7 7 7-7'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 16px 12px;
+        padding-right: 40px;
+    }
+
+    .file-upload-area {
+        border: 2px dashed #dee2e6;
+        border-radius: 15px;
+        padding: 40px;
+        text-align: center;
+        background: #f8f9fa;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .file-upload-area:hover {
+        border-color: #667eea;
+        background: #f0f2ff;
+    }
+
+    .file-upload-area.dragover {
+        border-color: #667eea;
+        background: #e8f0fe;
+        transform: scale(1.02);
+    }
+
+    .file-upload-icon {
+        font-size: 3rem;
+        color: #6c757d;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .file-upload-area:hover .file-upload-icon {
+        color: #667eea;
+        transform: scale(1.1);
+    }
+
+    .file-upload-text {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 10px;
+    }
+
+    .file-upload-subtext {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+    }
+
+    .file-input {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .file-info {
+        background: #e8f5e8;
+        border: 1px solid #c3e6c3;
+        border-radius: 8px;
+        padding: 15px;
+        margin-top: 15px;
+        display: none;
+    }
+
+    .file-info.show {
+        display: block;
+    }
+
+    .file-name {
+        font-weight: 600;
+        color: #155724;
+        margin-bottom: 5px;
+    }
+
+    .file-size {
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 15px;
+        justify-content: space-between;
+        margin-top: 30px;
+    }
+
+    .btn-cancel {
+        background: #6c757d;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 25px;
+        font-weight: 600;
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+    }
+
+    .btn-cancel:hover {
+        background: #5a6268;
+        transform: translateY(-1px);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-upload {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 12px 30px;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-upload:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-upload:disabled {
+        background: #6c757d;
+        box-shadow: none;
+        transform: none;
+        cursor: not-allowed;
+    }
+
+    .supported-formats {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .supported-formats h6 {
+        color: #495057;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .format-list {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .format-item {
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        padding: 8px 15px;
+        font-size: 0.9rem;
+        color: #495057;
+        font-weight: 500;
+    }
+
+    .create-shop-btn {
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        border: none;
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-weight: 600;
+        color: white;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        margin-bottom: 20px;
+        box-shadow: 0 3px 10px rgba(40, 167, 69, 0.3);
+    }
+
+    .create-shop-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 8px;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 768px) {
+        .upload-card {
+            padding: 25px;
+        }
+
+        .action-buttons {
+            flex-direction: column;
+        }
+
+        .format-list {
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="upload-container">
+    <!-- Header -->
+    <div class="upload-header">
+        <h1 class="upload-title">
+            <i class="fas fa-cloud-upload-alt me-3"></i>Upload Sales Data
+        </h1>
+        <p class="upload-subtitle">Upload your bank statements and financial data for reconciliation</p>
     </div>
 
-    <form method="POST" enctype="multipart/form-data">
+    <!-- Upload Form -->
+    <div class="upload-card">
+        <a href="{% url 'shop_create' %}" class="create-shop-btn">
+            <i class="fas fa-plus me-2"></i>Create New Shop
+        </a>
+
+        <form method="POST" enctype="multipart/form-data" id="uploadForm">
         {% csrf_token %}
+            
+            <!-- Shop Selection -->
         <div class="form-group">
-            <label for="shop">Select Shop</label>
-            <select class="form-control" id="shop" name="shop">
+                <label for="shop" class="form-label">
+                    <i class="fas fa-store me-2"></i>Select Shop
+                </label>
+                <select class="form-control form-select" id="shop" name="shop" required>
+                    <option value="">Choose a shop...</option>
                 {% for shop in shops %}
                     <option value="{{ shop.id }}">{{ shop.name }}</option>
                 {% endfor %}
             </select>
         </div>
 
+            <!-- File Upload Area -->
         <div class="form-group">
-            <label for="file">Upload CSV, Excel, or PDF File</label>
-            <input type="file" class="form-control" id="file" name="file" accept=".csv, .xls, .xlsx, .pdf" required>
+                <label class="form-label">
+                    <i class="fas fa-file me-2"></i>Upload File
+                </label>
+                <div class="file-upload-area" id="fileUploadArea">
+                    <input type="file" class="file-input" id="file" name="file" 
+                           accept=".csv,.xls,.xlsx,.pdf" required>
+                    <div class="file-upload-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="file-upload-text">Click to upload or drag and drop</div>
+                    <div class="file-upload-subtext">
+                        CSV, Excel (.xls, .xlsx), or PDF files
+                    </div>
+                </div>
+                <div class="file-info" id="fileInfo">
+                    <div class="file-name" id="fileName"></div>
+                    <div class="file-size" id="fileSize"></div>
+                </div>
+            </div>
+
+            <!-- Supported Formats -->
+            <div class="supported-formats">
+                <h6><i class="fas fa-info-circle me-2"></i>Supported File Formats</h6>
+                <div class="format-list">
+                    <div class="format-item">
+                        <i class="fas fa-file-csv me-1"></i>CSV
+                    </div>
+                    <div class="format-item">
+                        <i class="fas fa-file-excel me-1"></i>Excel (.xls)
+                    </div>
+                    <div class="format-item">
+                        <i class="fas fa-file-excel me-1"></i>Excel (.xlsx)
+                    </div>
+                    <div class="format-item">
+                        <i class="fas fa-file-pdf me-1"></i>PDF
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="{% url 'sales_data_list' %}" class="btn-cancel">
+                    <i class="fas fa-arrow-left me-2"></i>Cancel
+                </a>
+                <button type="submit" class="btn-upload" id="uploadBtn">
+                    <i class="fas fa-upload me-2"></i>Upload File
+                </button>
+            </div>
+        </form>
+    </div>
         </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const fileInput = document.getElementById('file');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const uploadForm = document.getElementById('uploadForm');
+
+    // File upload area click handler
+    fileUploadArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    // Drag and drop handlers
+    fileUploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        fileUploadArea.classList.add('dragover');
+    });
+
+    fileUploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+    });
+
+    fileUploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
         
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            handleFileSelect(files[0]);
+        }
+    });
+
+    // File input change handler
+    fileInput.addEventListener('change', function(e) {
+        if (e.target.files.length > 0) {
+            handleFileSelect(e.target.files[0]);
+        }
+    });
+
+    // Handle file selection
+    function handleFileSelect(file) {
+        fileName.textContent = file.name;
+        fileSize.textContent = formatFileSize(file.size);
+        fileInfo.classList.add('show');
         
-        <div class="d-flex justify-content-between">
-            <a href="{% url 'sales_data_list' %}" class="btn btn-link">🔙 Cancel</a>
-            <button type="submit" class="btn btn-primary">📤 Upload</button>
+        // Update upload area text
+        const uploadText = fileUploadArea.querySelector('.file-upload-text');
+        uploadText.textContent = 'File selected: ' + file.name;
+    }
+
+    // Format file size
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Form submission handler
+    uploadForm.addEventListener('submit', function(e) {
+        const shop = document.getElementById('shop').value;
+        const file = fileInput.files[0];
+        
+        if (!shop) {
+            e.preventDefault();
+            showNotification('Please select a shop', 'error');
+            return;
+        }
+        
+        if (!file) {
+            e.preventDefault();
+            showNotification('Please select a file to upload', 'error');
+            return;
+        }
+        
+        // Show loading state
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<span class="loading-spinner"></span>Uploading...';
+    });
+
+    // Auto-hide notifications
+    setTimeout(function() {
+        $('.alert').fadeOut();
+    }, 5000);
+});
+
+// Notification system
+function showNotification(message, type = 'info') {
+    const notification = $(`
+        <div class="notification alert alert-${type} alert-dismissible fade show" role="alert">
+            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
-    </form>
-</div>
+    `);
+    
+    $('body').append(notification);
+    
+    setTimeout(function() {
+        notification.fadeOut(function() {
+            notification.remove();
+        });
+    }, 5000);
+}
+</script>
+
 {% endblock %}
