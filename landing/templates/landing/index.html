@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>eAccountExpert - Professional Accounting Services</title>
+    {% load static %}
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --text-dark: #2c3e50;
+            --text-light: #6c757d;
+            --bg-light: #f8f9fa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+        
+        /* Navigation */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-brand {
+            font-weight: 800;
+            font-size: 1.8rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .navbar-brand img {
+            width: 45px;
+            height: 45px;
+            margin-right: 10px;
+        }
+        
+        .nav-link {
+            font-weight: 500;
+            color: var(--text-dark) !important;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: #667eea !important;
+        }
+        
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -5px;
+            left: 50%;
+            background: var(--primary-gradient);
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+        }
+        
+        .nav-link:hover::after {
+            width: 100%;
+        }
+        
+        .btn-dashboard {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        
+        .btn-dashboard:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            padding: 150px 0 100px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="%23667eea" opacity="0.1"><polygon points="1000,100 1000,0 0,100"/></svg>') no-repeat;
+            background-size: cover;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-light);
+            margin-bottom: 40px;
+            font-weight: 400;
+        }
+        
+        .hero-description {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 40px;
+            line-height: 1.8;
+        }
+        
+        /* Service Cards */
+        .services-section {
+            padding: 100px 0;
+            background: var(--bg-light);
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-dark);
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.2rem;
+            color: var(--text-light);
+            margin-bottom: 60px;
+        }
+        
+        .service-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+        }
+        
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        }
+        
+        .service-card.accounting::before { background: var(--success-gradient); }
+        .service-card.tax::before { background: var(--primary-gradient); }
+        .service-card.payroll::before { background: var(--warning-gradient); }
+        .service-card.consulting::before { background: var(--secondary-gradient); }
+        .service-card.franchise::before { background: var(--primary-gradient); }
+        
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .service-card.accounting .service-icon { background: var(--success-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .service-card.tax .service-icon { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .service-card.payroll .service-icon { background: var(--warning-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .service-card.consulting .service-icon { background: var(--secondary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .service-card.franchise .service-icon { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .service-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-dark);
+        }
+        
+        .service-description {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            flex-grow: 1;
+        }
+        
+        .service-btn {
+            background: transparent;
+            border: 2px solid #667eea;
+            color: #667eea;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .service-btn:hover {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        
+        .cta-description {
+            font-size: 1.2rem;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+        
+        .cta-btn {
+            background: white;
+            color: #667eea;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: none;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
+            color: #667eea;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 50px 0 30px;
+            text-align: center;
+        }
+        
+        .footer-content {
+            margin-bottom: 30px;
+        }
+        
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .footer-nav {
+            margin-bottom: 20px;
+        }
+        
+        .footer-nav a {
+            color: #ecf0f1;
+            text-decoration: none;
+            margin: 0 15px;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-nav a:hover {
+            color: #667eea;
+        }
+        
+        .footer-contact {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+        
+        .footer-bottom {
+            border-top: 1px solid #34495e;
+            padding-top: 20px;
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .service-card {
+                height: auto;
+                padding: 30px 20px;
+            }
+            
+            .navbar-brand {
+                font-size: 1.5rem;
+            }
+            
+            .nav-link {
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="{% url 'landing_page' %}">
+                <img src="{% static 'images/ea.png' %}" alt="eAccountExpert Logo">
+                eAccountExpert
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#services">Services</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                    <li class="nav-item ms-3">
+                        <a href="/dashboard/" class="btn-dashboard">
+                            <i class="fas fa-chart-line me-2"></i>Dashboard
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-12">
+                    <div class="hero-content text-center">
+                        <h1 class="hero-title">eAccountExpert Accounting Services</h1>
+                        <p class="hero-subtitle">Professional Financial Management Solutions</p>
+                        
+                        <div class="row justify-content-center">
+                            <div class="col-lg-8">
+                                <div class="hero-description">
+                                    <h4 class="mb-3" style="color: #667eea;">Overview:</h4>
+                                    <p>By emphasizing superior personal service, we aim to become more than just our clients' accountant - we seek to serve our customers as a trusted advisor and business partner, providing flexible, customized financial management solutions designed to work with our clients' unique environments and help their specialized needs.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services-section" id="services">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2 class="section-title">Our Professional Services</h2>
+                    <p class="section-subtitle">Comprehensive financial solutions tailored to your business needs</p>
+                </div>
+            </div>
+            
+            <div class="row">
+                <!-- Accounting Services -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="service-card accounting">
+                        <div>
+                            <i class="fas fa-calculator service-icon"></i>
+                            <h3 class="service-title">Accounting Services</h3>
+                            <p class="service-description">
+                                Having access to accurate and up-to-date financial information empowers you to make sound fiscal decisions that best benefit your business.
+                            </p>
+                        </div>
+                        <a href="#" class="service-btn">Learn More</a>
+                    </div>
+                </div>
+                
+                <!-- Tax Services -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="service-card tax">
+                        <div>
+                            <i class="fas fa-file-invoice-dollar service-icon"></i>
+                            <h3 class="service-title">Tax Services</h3>
+                            <p class="service-description">
+                                The Bottom Line is able to effortlessly map that need and specialize in providing customized tax preparation and return solutions for all of our clients.
+                            </p>
+                        </div>
+                        <a href="#" class="service-btn">Learn More</a>
+                    </div>
+                </div>
+                
+                <!-- Payroll Services -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="service-card payroll">
+                        <div>
+                            <i class="fas fa-users service-icon"></i>
+                            <h3 class="service-title">Payroll Services</h3>
+                            <p class="service-description">
+                                Many businesses face the challenge posed by having a staff just large enough to make managing payroll a hassle and just small enough not to warrant having a payroll department.
+                            </p>
+                        </div>
+                        <a href="#" class="service-btn">Learn More</a>
+                    </div>
+                </div>
+                
+                <!-- Consulting Services -->
+                <div class="col-lg-6 col-md-6">
+                    <div class="service-card consulting">
+                        <div>
+                            <i class="fas fa-handshake service-icon"></i>
+                            <h3 class="service-title">Consulting Services</h3>
+                            <p class="service-description">
+                                Through personalized service and a deep commitment to timely and precise reporting, we are able to adapt to and meet the unique needs of your business, but our commitment to you doesn't stop there.
+                            </p>
+                        </div>
+                        <a href="#" class="service-btn">Learn More</a>
+                    </div>
+                </div>
+                
+                <!-- Franchise Services -->
+                <div class="col-lg-6 col-md-6">
+                    <div class="service-card franchise">
+                        <div>
+                            <i class="fas fa-store service-icon"></i>
+                            <h3 class="service-title">Franchise Services</h3>
+                            <p class="service-description">
+                                Regardless of their physical store, successful franchisees across the country have one tool essential to their profitability: financial management support from experts in the franchise industry.
+                            </p>
+                        </div>
+                        <a href="#" class="service-btn">Learn More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="about">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h2 class="cta-title">Achieve Your Successful Bottom Line</h2>
+                    <p class="cta-description">
+                        For accounting, tax, and payroll services, get in touch with TBL today.
+                    </p>
+                    <a href="/dashboard/" class="cta-btn">
+                        <i class="fas fa-chart-line me-2"></i>Get Started Today
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">eAccountExpert</div>
+                <div class="footer-nav">
+                    <a href="#services">Services</a>
+                    <a href="#about">About</a>
+                    <a href="/dashboard/">Dashboard</a>
+                    <a href="#contact">Contact</a>
+                </div>
+                <div class="footer-contact">
+                    <i class="fas fa-phone me-2"></i>(800) 237-0704
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 eAccountExpert. All rights reserved. | E-BIT USA INC.</p>
+                <p>Website Designed, Developed, and Managed by Kmaruf Insight Advertising, Inc.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Smooth Scrolling -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.style.background = 'rgba(255, 255, 255, 0.98)';
+            } else {
+                navbar.style.background = 'rgba(255, 255, 255, 0.95)';
+            }
+        });
+    </script>
+</body>
+</html>

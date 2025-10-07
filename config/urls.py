@@ -17,14 +17,22 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
 
-def redirect_to_dashboard(request):
-    return redirect('sales_data_list')
+def smart_redirect(request):
+    """
+    Smart redirect: show landing page for non-authenticated users,
+    redirect to dashboard for authenticated users
+    """
+    if request.user.is_authenticated:
+        return redirect('sales_data_list')
+    else:
+        return redirect('landing_page')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', redirect_to_dashboard, name='landing-page'),
-    path('', include('sales.urls')),
+    path('', include('landing.urls')),  # Landing page at root
+    path('dashboard/', include('sales.urls')),  # Sales dashboard under /dashboard/
 ]
 from django.conf import settings
 from django.conf.urls.static import static
