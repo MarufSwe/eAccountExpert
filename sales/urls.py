@@ -4,6 +4,7 @@ from sales.views.reconciliation.category_mapping_views import *
 from sales.views.reconciliation.reconcile_sales_data_views import reconcile_sales_data
 from sales.views.reconciliation.reconciliation_list_views import reconciliation_list, update_reconciliation_field
 from sales.views.reconciliation.pl_report_views import pl_report, pl_report_json
+from sales.views.reconciliation.reconciliation_stats_views import reconciliation_stats, reconciliation_stats_json
 
 from .views.auth_views import register, user_login, user_logout
 from .views.sales_views import upload_sales_data, SalesDataListView
@@ -37,5 +38,8 @@ urlpatterns = [
     # P&L Report
     path('sales_data/<int:sales_data_id>/pl-report/', pl_report, name='pl_report'),
     path('sales_data/<int:sales_data_id>/pl-report/json/', pl_report_json, name='pl_report_json'),
+    # Reconciliation Statistics
+    path('sales_data/<int:sales_data_id>/stats/', reconciliation_stats, name='reconciliation_stats'),
+    path('sales_data/<int:sales_data_id>/stats/json/', reconciliation_stats_json, name='reconciliation_stats_json'),
 
 ]

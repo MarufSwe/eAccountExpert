@@ -458,7 +458,7 @@ function makeEditable(field) {
 function saveField(reconciliationId, fieldName, value, fieldElement) {
     fieldElement.classList.add('loading');
     
-    fetch(`/reconciliation/${reconciliationId}/update/`, {
+    fetch(`/dashboard/reconciliation/${reconciliationId}/update/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded',

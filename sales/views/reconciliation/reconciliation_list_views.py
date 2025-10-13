@@ -75,10 +75,16 @@ def reconciliation_list(request, sales_data_id):
 
         # Only auto-assign if fields are empty
         if not reconciliation.slicer_new or not reconciliation.category_new:
-            # Match description with slicer_list using regex
-            for mapping in category_mappings:
-                pattern = r'\b' + re.escape(mapping.slicer_list.strip()) + r'\b'
-                if re.search(pattern, reconciliation.description, re.IGNORECASE):
+            # Match description with slicer_list using EXACT EXCEL LOGIC (substring search)
+            # Sort by length (longest first) to prioritize more specific matches
+            sorted_mappings = sorted(category_mappings, key=lambda x: len(x.slicer_list.strip()), reverse=True)
+            
+            for mapping in sorted_mappings:
+                slicer_keyword = mapping.slicer_list.strip().upper()
+                description_upper = reconciliation.description.upper()
+                
+                # Excel formula: COUNTIF(C3,"*"&$M$2:$M$499&"*") - substring search
+                if slicer_keyword in description_upper:
                     matched_mapping = mapping
                     break
 
