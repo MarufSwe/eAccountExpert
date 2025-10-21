@@ -195,6 +195,64 @@
             min-width: 80px;
         }
     }
+
+    /* Category field styling */
+    .category-field-container {
+        min-height: 35px;
+        cursor: pointer;
+    }
+
+    .category-display {
+        padding: 8px 12px;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        min-height: 35px;
+        display: flex;
+        align-items: center;
+    }
+
+    .category-display:hover {
+        background-color: #f8f9fa;
+        border-color: #dee2e6;
+    }
+
+    .category-display.empty {
+        background-color: #fff3cd;
+        border-color: #ffeaa7;
+        color: #856404;
+    }
+
+    .category-display.empty:hover {
+        background-color: #fff3cd;
+        border-color: #ffc107;
+    }
+
+    .category-text {
+        font-weight: 500;
+        color: #495057;
+    }
+
+    .empty-text {
+        color: #856404;
+        font-style: italic;
+        font-size: 0.9rem;
+    }
+
+    .category-edit-mode {
+        position: relative;
+    }
+
+    /* Select2 customization for inline dropdown */
+    .select2-container--bootstrap-5 .select2-selection {
+        min-height: 35px;
+        border-color: #007bff;
+    }
+
+    .select2-container--bootstrap-5 .select2-selection:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
 </style>
 
 <div class="container-fluid">
@@ -334,15 +392,28 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <div class="editable-field {% if not reconciliation.category_new.strip %}empty{% endif %}" 
-                                             data-field="category_new" 
+                                        <div class="category-field-container" 
                                              data-id="{{ reconciliation.id }}"
                                              data-value="{{ reconciliation.category_new|default:'' }}">
-                                            {% if reconciliation.category_new.strip %}
-                                                {{ reconciliation.category_new }}
-                                            {% else %}
-                                                Click to add category
-                                            {% endif %}
+                                            
+                                            <!-- Display Mode -->
+                                            <div class="category-display {% if not reconciliation.category_new.strip %}empty{% endif %}">
+                                                {% if reconciliation.category_new.strip %}
+                                                    <span class="category-text">{{ reconciliation.category_new }}</span>
+                                                {% else %}
+                                                    <span class="empty-text">Click to select category</span>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <!-- Edit Mode (hidden by default) -->
+                                            <div class="category-edit-mode" style="display: none;">
+                                                <select class="category-select form-select" style="width: 100%;">
+                                                    <option value="">-- Select Category --</option>
+                                                    {% for category in all_category_options %}
+                                                        <option value="{{ category }}" {% if category == reconciliation.category_new %}selected{% endif %}>{{ category }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
                                         </div>
                                     </td>
                                     <td class="text-center">
@@ -367,12 +438,56 @@
     </div>
 </div>
 
+
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Use event delegation for better reliability
+    // Handle category field clicks for inline editing
     document.addEventListener('click', function(e) {
-        // Handle editable field clicks
-        if (e.target.closest('.editable-field') && !e.target.closest('.edit-input') && !e.target.closest('.edit-buttons')) {
+        // Handle category field clicks
+        if (e.target.closest('.category-display')) {
+            e.preventDefault();
+            
+            const container = e.target.closest('.category-field-container');
+            const displayMode = container.querySelector('.category-display');
+            const editMode = container.querySelector('.category-edit-mode');
+            const select = container.querySelector('.category-select');
+            
+            // Switch to edit mode
+            displayMode.style.display = 'none';
+            editMode.style.display = 'block';
+            
+            // Initialize Select2 for this specific dropdown
+            $(select).select2({
+                theme: 'bootstrap-5',
+                placeholder: '-- Select Category --',
+                allowClear: true,
+                width: '100%'
+            });
+            
+            // Focus and open the dropdown
+            $(select).select2('open');
+            
+            // Handle selection
+            $(select).on('select2:select', function(e) {
+                const selectedValue = e.params.data.id;
+                const reconciliationId = container.dataset.id;
+                
+                // Save to database
+                saveCategoryField(reconciliationId, selectedValue, container);
+            });
+            
+            // Handle close without selection
+            $(select).on('select2:close', function(e) {
+                const selectedValue = $(this).val();
+                if (!selectedValue) {
+                    // No selection made, revert to display mode
+                    revertToDisplayMode(container);
+                }
+            });
+        }
+        
+        // Handle editable field clicks (for Slicer New - keep existing functionality)
+        else if (e.target.closest('.editable-field') && !e.target.closest('.edit-input') && !e.target.closest('.edit-buttons')) {
             const field = e.target.closest('.editable-field');
             if (!field.querySelector('.edit-input')) {
                 makeEditable(field);
@@ -537,6 +652,76 @@ function showNotification(message, type) {
             notification.remove();
         }
     }, 3000);
+}
+
+// Helper function to save category field
+function saveCategoryField(reconciliationId, selectedValue, container) {
+    // Show loading state
+    const editMode = container.querySelector('.category-edit-mode');
+    editMode.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Saving...</div>';
+    
+    // Save to database
+    fetch(`/dashboard/reconciliation/${reconciliationId}/update/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: `field_name=category_new&field_value=${encodeURIComponent(selectedValue)}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Update container data
+            container.dataset.value = selectedValue;
+            
+            // Update display mode
+            const displayMode = container.querySelector('.category-display');
+            displayMode.classList.remove('empty');
+            displayMode.innerHTML = `<span class="category-text">${selectedValue}</span>`;
+            
+            // Switch back to display mode
+            revertToDisplayMode(container);
+            
+            // Show success notification
+            showNotification('Category updated successfully!', 'success');
+        } else {
+            showNotification('Error: ' + (data.error || 'Failed to update category'), 'error');
+            revertToDisplayMode(container);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Network error occurred', 'error');
+        revertToDisplayMode(container);
+    });
+}
+
+// Helper function to revert to display mode
+function revertToDisplayMode(container) {
+    const displayMode = container.querySelector('.category-display');
+    const editMode = container.querySelector('.category-edit-mode');
+    const select = container.querySelector('.category-select');
+    
+    // Destroy Select2 instance
+    if ($(select).hasClass('select2-hidden-accessible')) {
+        $(select).select2('destroy');
+    }
+    
+    // Reset edit mode HTML
+    const currentValue = container.dataset.value;
+    editMode.innerHTML = `
+        <select class="category-select form-select" style="width: 100%;">
+            <option value="">-- Select Category --</option>
+            {% for category in all_category_options %}
+                <option value="{{ category }}" ${currentValue === '{{ category }}' ? 'selected' : ''}>{{ category }}</option>
+            {% endfor %}
+        </select>
+    `;
+    
+    // Switch back to display mode
+    displayMode.style.display = 'block';
+    editMode.style.display = 'none';
 }
 
 function getCookie(name) {

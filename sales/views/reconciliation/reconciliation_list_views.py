@@ -68,6 +68,13 @@ def reconciliation_list(request, sales_data_id):
 
     # Get all reconciliations for the current SalesData
     reconciliations = Reconciliation.objects.filter(sales_data=sales_data)
+    
+    # Get unique category options for dropdown (Cat_List_d for debits, Cat_List_c for credits)
+    cat_list_d_options = list(set(mapping.cat_list_d for mapping in category_mappings if mapping.cat_list_d))
+    cat_list_c_options = list(set(mapping.cat_list_c for mapping in category_mappings if mapping.cat_list_c))
+    
+    # Combine and sort all unique categories
+    all_category_options = sorted(list(set(cat_list_d_options + cat_list_c_options)))
 
     # Assign slicer/category info to each reconciliation entry
     for reconciliation in reconciliations:
@@ -136,6 +143,9 @@ def reconciliation_list(request, sales_data_id):
         'reconciliations': reconciliations,
         'category_mappings': category_mappings,
         'pivot_summary': pivot_summary,
+        'all_category_options': all_category_options,
+        'cat_list_d_options': cat_list_d_options,
+        'cat_list_c_options': cat_list_c_options,
     })
 
 
