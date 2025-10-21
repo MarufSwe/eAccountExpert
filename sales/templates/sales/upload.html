@@ -302,25 +302,17 @@
 
     <!-- Upload Form -->
     <div class="upload-card">
-        <a href="{% url 'shop_create' %}" class="create-shop-btn">
-            <i class="fas fa-plus me-2"></i>Create New Shop
-        </a>
+        <!-- Selected Shop Info -->
+        <div class="alert alert-info mb-4">
+            <i class="fas fa-store me-2"></i>
+            <strong>Uploading for:</strong> {{ selected_shop.name }}
+            {% if selected_shop.location %}
+                <span class="ms-2">(<i class="fas fa-map-marker-alt me-1"></i>{{ selected_shop.location }})</span>
+            {% endif %}
+        </div>
 
         <form method="POST" enctype="multipart/form-data" id="uploadForm">
         {% csrf_token %}
-            
-            <!-- Shop Selection -->
-        <div class="form-group">
-                <label for="shop" class="form-label">
-                    <i class="fas fa-store me-2"></i>Select Shop
-                </label>
-                <select class="form-control form-select" id="shop" name="shop" required>
-                    <option value="">Choose a shop...</option>
-                {% for shop in shops %}
-                    <option value="{{ shop.id }}">{{ shop.name }}</option>
-                {% endfor %}
-            </select>
-        </div>
 
             <!-- File Upload Area -->
         <div class="form-group">
@@ -361,7 +353,7 @@
                         <i class="fas fa-file-pdf me-1"></i>PDF
                     </div>
                 </div>
-            </div>
+        </div>
 
             <!-- Action Buttons -->
             <div class="action-buttons">
@@ -442,14 +434,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Form submission handler
     uploadForm.addEventListener('submit', function(e) {
-        const shop = document.getElementById('shop').value;
         const file = fileInput.files[0];
-        
-        if (!shop) {
-            e.preventDefault();
-            showNotification('Please select a shop', 'error');
-            return;
-        }
         
         if (!file) {
             e.preventDefault();

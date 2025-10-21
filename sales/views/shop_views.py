@@ -4,7 +4,26 @@ from ..forms import ShopForm
 from django.contrib.auth.decorators import login_required
 
 
-# ✅ List all shops
+# ✅ Shop selection page (landing after login)
+@login_required
+def shop_selection(request):
+    shops = Shop.objects.all()
+    return render(request, 'shops/shop_selection.html', {'shops': shops})
+
+
+# ✅ Handle shop selection
+@login_required
+def select_shop(request):
+    if request.method == 'POST':
+        shop_id = request.POST.get('shop_id')
+        if shop_id:
+            # Store selected shop in session
+            request.session['selected_shop_id'] = int(shop_id)
+            return redirect('sales_data_list')
+    return redirect('shop_selection')
+
+
+# ✅ List all shops (admin view)
 @login_required
 def shop_list(request):
     shops = Shop.objects.all()

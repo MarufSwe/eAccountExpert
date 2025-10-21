@@ -14,13 +14,25 @@ class SalesDataListView(LoginRequiredMixin, ListView):
     template_name = 'sales/sales_data_list.html'
     context_object_name = 'sales_data'
 
+    def dispatch(self, request, *args, **kwargs):
+        # Check if shop is selected
+        if 'selected_shop_id' not in request.session:
+            return redirect('shop_selection')
+        return super().dispatch(request, *args, **kwargs)
+
     def get_queryset(self):
-        queryset = SalesData.objects.all().order_by('shop', 'date_uploaded')
+        # Filter by selected shop only
+        selected_shop_id = self.request.session.get('selected_shop_id')
+        queryset = SalesData.objects.filter(shop_id=selected_shop_id).order_by('-date_uploaded')
         
         return queryset
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        
+        # Get selected shop
+        selected_shop_id = self.request.session.get('selected_shop_id')
+        selected_shop = Shop.objects.get(id=selected_shop_id)
         
         # Calculate reconciliation statistics
         total_uploads = self.get_queryset().count()
@@ -45,6 +57,7 @@ class SalesDataListView(LoginRequiredMixin, ListView):
                 pending_count += 1
         
         context.update({
+            'selected_shop': selected_shop,
             'total_uploads': total_uploads,
             'reconciled_count': reconciled_count,
             'pending_count': pending_count,
@@ -115,7 +128,12 @@ from django.http import HttpResponse
 from django.db import IntegrityError
 
 def upload_sales_data(request):
-    shops = Shop.objects.all()  # Fetch all shops
+    # Check if shop is selected
+    if 'selected_shop_id' not in request.session:
+        return redirect('shop_selection')
+    
+    selected_shop_id = request.session.get('selected_shop_id')
+    selected_shop = Shop.objects.get(id=selected_shop_id)
     all_rows = []  # Initialize to prevent errors
 
     if request.method == 'POST' and request.FILES['file']:
@@ -168,14 +186,8 @@ def upload_sales_data(request):
             else:
                 return HttpResponse("Invalid file format. Only .csv, .xlsx, and .pdf are supported.", status=400)
 
-            selected_shop_id = request.POST.get('shop')
-            if not selected_shop_id:
-                return HttpResponse("Shop is required", status=400)
-            
-            shop = Shop.objects.get(id=selected_shop_id)
-
             if all_rows:  # Ensure we only save if there's data
-                SalesData.objects.create(shop=shop, data=all_rows)
+                SalesData.objects.create(shop=selected_shop, data=all_rows)
 
             return redirect('sales_data_list')
 
@@ -184,4 +196,4 @@ def upload_sales_data(request):
         except Exception as e:
             return HttpResponse(f"An error occurred: {e}", status=400)
 
-    return render(request, 'sales/upload.html', {'shops': shops})
+    return render(request, 'sales/upload.html', {'selected_shop': selected_shop})

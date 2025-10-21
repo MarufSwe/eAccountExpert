@@ -8,7 +8,7 @@ from sales.views.reconciliation.reconciliation_stats_views import reconciliation
 
 from .views.auth_views import register, user_login, user_logout
 from .views.sales_views import upload_sales_data, SalesDataListView
-from .views.shop_views import shop_list, shop_create
+from .views.shop_views import shop_list, shop_create, shop_selection, select_shop
 
 
 urlpatterns = [
@@ -16,10 +16,15 @@ urlpatterns = [
     path('login/', user_login, name='login'),
     path('logout/', user_logout, name='logout'),
 
+    # Shop selection (landing after login)
+    path('select-shop/', shop_selection, name='shop_selection'),
+    path('select-shop/submit/', select_shop, name='select_shop'),
 
+    # Sales data (requires shop selection)
     path('sales', SalesDataListView.as_view(), name='sales_data_list'),
     path('upload/', upload_sales_data, name='upload_sales_data'),
 
+    # Shop management
     path('shops/', shop_list, name='shop_list'),
     path('shops/create/', shop_create, name='shop_create'),
 

@@ -22,10 +22,10 @@ from django.contrib.auth.decorators import login_required
 def smart_redirect(request):
     """
     Smart redirect: show landing page for non-authenticated users,
-    redirect to dashboard for authenticated users
+    redirect to shop selection for authenticated users
     """
     if request.user.is_authenticated:
-        return redirect('sales_data_list')
+        return redirect('shop_selection')
     else:
         return redirect('landing_page')
 

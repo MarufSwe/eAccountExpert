@@ -1,0 +1,511 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Select Your Shop{% endblock %}
+
+{% block content %}
+<style>
+    .shop-selection-container {
+        min-height: calc(100vh - 80px);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        margin: -20px;
+        padding: 60px 40px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Animated background circles */
+    .bg-circle {
+        position: absolute;
+        border-radius: 50%;
+        opacity: 0.1;
+        animation: float 20s infinite ease-in-out;
+    }
+
+    .bg-circle-1 {
+        width: 400px;
+        height: 400px;
+        background: white;
+        top: -100px;
+        left: -100px;
+        animation-delay: 0s;
+    }
+
+    .bg-circle-2 {
+        width: 300px;
+        height: 300px;
+        background: white;
+        bottom: -50px;
+        right: -50px;
+        animation-delay: 5s;
+    }
+
+    .bg-circle-3 {
+        width: 200px;
+        height: 200px;
+        background: white;
+        top: 50%;
+        right: 10%;
+        animation-delay: 10s;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) translateX(0px); }
+        50% { transform: translateY(-30px) translateX(30px); }
+    }
+
+    .selection-header {
+        text-align: center;
+        margin-bottom: 50px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .selection-header h1 {
+        color: white;
+        font-weight: 800;
+        font-size: 3rem;
+        margin-bottom: 15px;
+        text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .selection-header p {
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1.3rem;
+        font-weight: 300;
+    }
+
+    .shops-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 25px;
+        max-width: 1600px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+    }
+
+    .shop-card {
+        background: white;
+        border-radius: 16px;
+        padding: 25px;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 3px solid transparent;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* Colorful borders for cards */
+    .shop-card:nth-child(4n+1) {
+        border-color: #667eea;
+        box-shadow: 0 10px 40px rgba(102, 126, 234, 0.25);
+    }
+
+    .shop-card:nth-child(4n+2) {
+        border-color: #f093fb;
+        box-shadow: 0 10px 40px rgba(240, 147, 251, 0.25);
+    }
+
+    .shop-card:nth-child(4n+3) {
+        border-color: #4facfe;
+        box-shadow: 0 10px 40px rgba(79, 172, 254, 0.25);
+    }
+
+    .shop-card:nth-child(4n+4) {
+        border-color: #43e97b;
+        box-shadow: 0 10px 40px rgba(67, 233, 123, 0.25);
+    }
+
+    .shop-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        transform: scaleX(0);
+        transition: transform 0.3s ease;
+    }
+
+    .shop-card:nth-child(4n+1)::before {
+        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .shop-card:nth-child(4n+2)::before {
+        background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .shop-card:nth-child(4n+3)::before {
+        background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .shop-card:nth-child(4n+4)::before {
+        background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+    }
+
+    .shop-card:hover::before {
+        transform: scaleX(1);
+    }
+
+    .shop-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 15px 50px rgba(102, 126, 234, 0.3);
+    }
+
+    .shop-card:nth-child(4n+1):hover {
+        box-shadow: 0 15px 50px rgba(102, 126, 234, 0.4);
+        border-color: #667eea;
+    }
+
+    .shop-card:nth-child(4n+2):hover {
+        box-shadow: 0 15px 50px rgba(240, 147, 251, 0.4);
+        border-color: #f093fb;
+    }
+
+    .shop-card:nth-child(4n+3):hover {
+        box-shadow: 0 15px 50px rgba(79, 172, 254, 0.4);
+        border-color: #4facfe;
+    }
+
+    .shop-card:nth-child(4n+4):hover {
+        box-shadow: 0 15px 50px rgba(67, 233, 123, 0.4);
+        border-color: #43e97b;
+    }
+
+    /* Icon backgrounds with matching colors */
+    .shop-card:nth-child(4n+1) .shop-icon-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .shop-card:nth-child(4n+2) .shop-icon-bg {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .shop-card:nth-child(4n+3) .shop-icon-bg {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .shop-card:nth-child(4n+4) .shop-icon-bg {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+
+    .shop-icon-bg {
+        width: 60px;
+        height: 60px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 18px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .shop-icon {
+        font-size: 1.8rem;
+        color: white;
+    }
+
+    .shop-card h3 {
+        margin: 0 0 15px 0;
+        font-weight: 700;
+        color: #2c3e50;
+        font-size: 1.2rem;
+        line-height: 1.3;
+    }
+
+    .shop-info {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .shop-info-item {
+        display: flex;
+        align-items: center;
+        color: #5a6c7d;
+        font-size: 0.88rem;
+    }
+
+    .shop-info-item i {
+        width: 20px;
+        margin-right: 8px;
+        font-size: 0.9rem;
+    }
+
+    /* Different icon colors for each card */
+    .shop-card:nth-child(4n+1) .shop-info-item i {
+        color: #667eea;
+    }
+
+    .shop-card:nth-child(4n+2) .shop-info-item i {
+        color: #f093fb;
+    }
+
+    .shop-card:nth-child(4n+3) .shop-info-item i {
+        color: #4facfe;
+    }
+
+    .shop-card:nth-child(4n+4) .shop-info-item i {
+        color: #43e97b;
+    }
+
+    .shop-arrow {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        opacity: 0;
+        transform: translateX(-10px);
+        transition: all 0.3s ease;
+    }
+
+    .shop-card:nth-child(4n+1) .shop-arrow {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .shop-card:nth-child(4n+2) .shop-arrow {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .shop-card:nth-child(4n+3) .shop-arrow {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    }
+
+    .shop-card:nth-child(4n+4) .shop-arrow {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
+
+    .shop-card:hover .shop-arrow {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .no-shops-container {
+        background: white;
+        border-radius: 20px;
+        padding: 60px;
+        text-align: center;
+        max-width: 600px;
+        margin: 0 auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+
+    .no-shops-container i {
+        font-size: 5rem;
+        color: #bdc3c7;
+        margin-bottom: 30px;
+    }
+
+    .no-shops-container h3 {
+        color: #2c3e50;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+
+    .no-shops-container p {
+        color: #7f8c8d;
+        font-size: 1.1rem;
+        margin-bottom: 30px;
+    }
+
+    .create-shop-btn {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border: none;
+        padding: 15px 40px;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(240, 147, 251, 0.3);
+        font-size: 1.1rem;
+    }
+
+    .create-shop-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(240, 147, 251, 0.5);
+        color: white;
+        text-decoration: none;
+    }
+
+    /* Loading animation */
+    .shop-card.loading {
+        pointer-events: none;
+        opacity: 0.6;
+    }
+
+    .shop-card.loading::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 40px;
+        height: 40px;
+        margin: -20px 0 0 -20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1400px) {
+        .shops-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+    }
+
+    @media (max-width: 1024px) {
+        .shops-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .selection-header h1 {
+            font-size: 2.5rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .shop-selection-container {
+            padding: 40px 20px;
+        }
+
+        .selection-header h1 {
+            font-size: 2rem;
+        }
+
+        .selection-header p {
+            font-size: 1rem;
+        }
+
+        .shops-grid {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .shop-card {
+            padding: 20px;
+        }
+
+        .shop-icon-bg {
+            width: 50px;
+            height: 50px;
+        }
+
+        .shop-icon {
+            font-size: 1.5rem;
+        }
+
+        .shop-card h3 {
+            font-size: 1.1rem;
+        }
+
+        .shop-info-item {
+            font-size: 0.85rem;
+        }
+    }
+</style>
+
+<div class="shop-selection-container">
+    <!-- Animated Background Circles -->
+    <div class="bg-circle bg-circle-1"></div>
+    <div class="bg-circle bg-circle-2"></div>
+    <div class="bg-circle bg-circle-3"></div>
+
+    <!-- Header -->
+    <div class="selection-header">
+        <h1><i class="fas fa-store-alt me-3"></i>Select Your Shop</h1>
+        <p>Choose the shop you want to manage and view sales data</p>
+    </div>
+
+    {% if shops %}
+        <!-- Shops Grid -->
+        <div class="shops-grid">
+            {% for shop in shops %}
+                <div class="shop-card" onclick="selectShop({{ shop.id }}, this)">
+                    <div class="shop-icon-bg">
+                        <i class="fas fa-store-alt shop-icon"></i>
+                    </div>
+                    
+                    <h3>{{ shop.name }}</h3>
+                    
+                    <div class="shop-info">
+                        {% if shop.location %}
+                            <div class="shop-info-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>{{ shop.location }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        {% if shop.owner_name %}
+                            <div class="shop-info-item">
+                                <i class="fas fa-user"></i>
+                                <span>{{ shop.owner_name }}</span>
+                            </div>
+                        {% endif %}
+                        
+                        {% if shop.contact_number %}
+                            <div class="shop-info-item">
+                                <i class="fas fa-phone"></i>
+                                <span>{{ shop.contact_number }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="shop-arrow">
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- No Shops Message -->
+        <div class="no-shops-container">
+            <i class="fas fa-store-slash"></i>
+            <h3>No Shops Available</h3>
+            <p>Please create a shop to get started with your sales data management.</p>
+            <a href="{% url 'shop_create' %}" class="create-shop-btn">
+                <i class="fas fa-plus me-2"></i>Create New Shop
+            </a>
+        </div>
+    {% endif %}
+
+    <!-- Hidden form for submission -->
+    <form method="post" action="{% url 'select_shop' %}" id="shopSelectionForm" style="display: none;">
+        {% csrf_token %}
+        <input type="hidden" name="shop_id" id="selectedShopId" value="">
+    </form>
+</div>
+
+<script>
+function selectShop(shopId, cardElement) {
+    // Add loading state to clicked card
+    cardElement.classList.add('loading');
+    
+    // Update hidden input
+    document.getElementById('selectedShopId').value = shopId;
+    
+    // Submit form automatically
+    document.getElementById('shopSelectionForm').submit();
+}
+</script>
+
+{% endblock %}
+

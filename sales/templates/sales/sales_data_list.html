@@ -407,9 +407,14 @@
         <div class="row align-items-center">
             <div class="col-md-8">
                 <h1 class="page-title">
-                    <i class="fas fa-chart-bar me-3"></i>Sales Data Dashboard
+                    <i class="fas fa-store me-3"></i>{{ selected_shop.name }}
                 </h1>
-                <p class="page-subtitle">Manage and reconcile your financial transactions</p>
+                <p class="page-subtitle">
+                    {% if selected_shop.location %}<i class="fas fa-map-marker-alt me-2"></i>{{ selected_shop.location }} | {% endif %}
+                    <a href="{% url 'shop_selection' %}" class="btn btn-sm btn-light">
+                        <i class="fas fa-exchange-alt"></i> Change Shop
+                    </a>
+                </p>
             </div>
             <div class="col-md-4 text-md-end">
                 <a href="{% url 'upload_sales_data' %}" class="upload-btn">
@@ -477,37 +482,6 @@
                         <i class="fas fa-list me-1"></i>View Details
                     </a>
                 </div>
-            </div>
-            
-            <div class="card-body">
-                {% if sales.data %}
-                    <div class="scrollable-container">
-                        <table class="professional-table data-table">
-                            <thead>
-                                <tr>
-                                    {% for key in sales.data.0.keys %}
-                                        <th>{{ key|capfirst }}</th>
-                                    {% endfor %}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for record in sales.data %}
-                                    <tr>
-                                        {% for value in record.values %}
-                                            <td>{{ value }}</td>
-                                        {% endfor %}
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                {% else %}
-                    <div class="empty-state">
-                        <i class="fas fa-inbox"></i>
-                        <h4>No Data Available</h4>
-                        <p>This upload doesn't contain any data.</p>
-                    </div>
-                {% endif %}
             </div>
         </div>
     {% endfor %}
