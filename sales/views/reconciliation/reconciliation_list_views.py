@@ -2,10 +2,30 @@ import random
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from functools import wraps
 # from sales.models import CatListC, CatListD, SalesData, Reconciliation, SlicerList
 from sales.models import CategoryMapping, SalesData, Reconciliation
 import re
 import random
+import json
+
+
+def ajax_login_required(view_func):
+    """
+    Decorator for AJAX views that require authentication.
+    Returns JSON error instead of redirecting to login page.
+    """
+    @wraps(view_func)
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return JsonResponse({
+                'success': False,
+                'error': 'Authentication required'
+            }, status=401)
+        return view_func(request, *args, **kwargs)
+    return wrapper
 
 # def reconciliation_list(request, sales_data_id):
 #     # Get the specific SalesData object
@@ -149,41 +169,51 @@ def reconciliation_list(request, sales_data_id):
     })
 
 
+@ajax_login_required
 @csrf_exempt
 def update_reconciliation_field(request, reconciliation_id):
     """Update slicer_new or category_new field for a reconciliation record"""
-    if request.method == "POST":
-        try:
-            reconciliation = get_object_or_404(Reconciliation, id=reconciliation_id)
-            
-            # Get the field name and value from the request
-            field_name = request.POST.get('field_name')
-            field_value = request.POST.get('field_value', '').strip()
-            
-            # Debug logging
-            print(f"Updating reconciliation {reconciliation_id}: {field_name} = '{field_value}'")
-            
-            # Validate field name
-            if field_name not in ['slicer_new', 'category_new']:
-                return JsonResponse({"success": False, "error": "Invalid field name"})
-            
-            # Update the field
-            setattr(reconciliation, field_name, field_value)
-            reconciliation.save()
-            
-            # Verify the save worked
-            reconciliation.refresh_from_db()
-            saved_value = getattr(reconciliation, field_name)
-            print(f"Saved value: '{saved_value}'")
-            
-            return JsonResponse({
-                "success": True, 
-                "message": f"{field_name} updated successfully",
-                "new_value": saved_value
-            })
-            
-        except Exception as e:
-            print(f"Error updating reconciliation field: {str(e)}")
-            return JsonResponse({"success": False, "error": str(e)})
     
-    return JsonResponse({"success": False, "error": "Invalid request method"})
+    # Only accept POST requests
+    if request.method != 'POST':
+        return JsonResponse({"success": False, "error": "Only POST requests allowed"}, status=405)
+    
+    try:
+        reconciliation = get_object_or_404(Reconciliation, id=reconciliation_id)
+        
+        # Get the field name and value from the request
+        field_name = request.POST.get('field_name')
+        field_value = request.POST.get('field_value', '').strip()
+        
+        # Debug logging
+        print(f"Updating reconciliation {reconciliation_id}: {field_name} = '{field_value}'")
+        print(f"User: {request.user}")
+        print(f"POST data: {request.POST}")
+        
+        # Validate field name
+        if field_name not in ['slicer_new', 'category_new']:
+            return JsonResponse({"success": False, "error": "Invalid field name"}, status=400)
+        
+        # Update the field
+        setattr(reconciliation, field_name, field_value)
+        reconciliation.save()
+        
+        # Verify the save worked
+        reconciliation.refresh_from_db()
+        saved_value = getattr(reconciliation, field_name)
+        print(f"Saved value: '{saved_value}'")
+        
+        return JsonResponse({
+            "success": True, 
+            "message": f"{field_name} updated successfully",
+            "new_value": saved_value
+        })
+        
+    except Reconciliation.DoesNotExist:
+        print(f"Reconciliation {reconciliation_id} not found")
+        return JsonResponse({"success": False, "error": "Reconciliation not found"}, status=404)
+    except Exception as e:
+        print(f"Error updating reconciliation field: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
